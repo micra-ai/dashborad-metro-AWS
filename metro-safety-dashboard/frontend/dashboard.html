@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Metro Visión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Metro Visión</div>
+        <ul class="nav-links">
+            <li class="active"><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="events.html">Histórico de Eventos</a></li>
+            <li><a href="#" onclick="logout()">Cerrar Sesión</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <header>
+            <h1>Resumen Operacional</h1>
+            <div class="header-info">
+                <span>Última actualización: <strong id="last-update">-</strong></span>
+            </div>
+        </header>
+
+        <section class="summary-cards">
+            <div class="card card-blue">
+                <h3>Total Eventos Recibidos</h3>
+                <p id="total-events" class="value">0</p>
+            </div>
+            <div class="card card-purple">
+                <h3>Dispositivos Activos</h3>
+                <p id="active-devices" class="value">0</p>
+            </div>
+        </section>
+
+        <div class="grid-layout">
+            <section class="panel epp-panel">
+                <h2>Control EPP (Equipos de Protección)</h2>
+                <div class="panel-grid">
+                    <div class="stat-box">
+                        <h4>Trabajadores Detectados</h4>
+                        <p id="epp-workers">0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Cumplimiento Global</h4>
+                        <p id="epp-compliance">0%</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Cumplimiento Total</h4>
+                        <p id="epp-full">0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>EPP Más Faltante</h4>
+                        <p id="epp-missing" style="color: #ef4444">-</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel excavation-panel">
+                <h2>Frente de Trabajo / Excavación</h2>
+                <div class="panel-grid">
+                    <div class="stat-box">
+                        <h4>Nivel de Riesgo Actual</h4>
+                        <p id="exc-risk-level" class="risk-badge risk-LOW">LOW</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Rocas Grandes</h4>
+                        <p id="exc-rocks">0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Deslizamientos</h4>
+                        <p id="exc-landslides">0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Alarmas Activadas</h4>
+                        <p id="exc-alarms" style="color: #ef4444">0</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

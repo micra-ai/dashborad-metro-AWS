@@ -1,0 +1,132 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #111827;
+    margin: 0;
+    color: #f3f4f6;
+    display: flex;
+    height: 100vh;
+}
+.sidebar {
+    width: 250px;
+    background-color: #1f2937;
+    padding: 2rem 1rem;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+.sidebar .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e51e25;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.nav-links {
+    list-style: none;
+    padding: 0;
+}
+.nav-links li {
+    margin-bottom: 1rem;
+}
+.nav-links a {
+    color: #9ca3af;
+    text-decoration: none;
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.nav-links li.active a, .nav-links a:hover {
+    background-color: #374151;
+    color: white;
+}
+.main-content {
+    flex: 1;
+    padding: 2rem 3rem;
+    overflow-y: auto;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+.header-info {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+.summary-cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.card {
+    flex: 1;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: #1f2937;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+.card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    color: #9ca3af;
+}
+.card .value {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+.card-blue .value { color: #3b82f6; }
+.card-purple .value { color: #8b5cf6; }
+
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+.panel {
+    background: #1f2937;
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+.panel h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #374151;
+    padding-bottom: 0.75rem;
+}
+.panel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.stat-box {
+    background: #111827;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+.stat-box h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+.stat-box p {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.risk-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    display: inline-block;
+}
+.risk-LOW { background: #059669; color: white; }
+.risk-MEDIUM { background: #d97706; color: white; }
+.risk-HIGH { background: #dc2626; color: white; }

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico - Metro Visión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: #1f2937;
+            padding: 1rem;
+            border-radius: 8px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 0.25rem;
+        }
+        .filter-group select, .filter-group input {
+            padding: 0.5rem;
+            background: #111827;
+            border: 1px solid #374151;
+            color: white;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover { background-color: #2563eb; }
+        .btn-export { background-color: #059669; }
+        .btn-export:hover { background-color: #047857; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1f2937;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #374151;
+        }
+        th {
+            background: #111827;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+        tr:hover { background-color: #374151; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Metro Visión</div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li class="active"><a href="events.html">Histórico de Eventos</a></li>
+            <li><a href="#" onclick="logout()">Cerrar Sesión</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <header>
+            <h1>Histórico de Eventos</h1>
+        </header>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Tipo de Evento</label>
+                <select id="filter-type">
+                    <option value="">Todos</option>
+                    <option value="EPP_DETECTION">EPP</option>
+                    <option value="EXCAVATION_RISK_DETECTION">Excavación</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Dispositivo</label>
+                <input type="text" id="filter-device" placeholder="ID Dispositivo">
+            </div>
+            <button class="btn" onclick="loadEvents()">Filtrar</button>
+            <button class="btn btn-export" onclick="exportCSV()" style="margin-left: auto;">Exportar CSV</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Evento</th>
+                    <th>Tipo</th>
+                    <th>Dispositivo</th>
+                    <th>Fecha Recepción</th>
+                    <th>Estado Validación</th>
+                </tr>
+            </thead>
+            <tbody id="events-table-body">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/events.js"></script>
+</body>
+</html>
