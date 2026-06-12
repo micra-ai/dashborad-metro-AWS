@@ -55,4 +55,5 @@ class EppEventPayload(BaseModel):
     summary: Summary
     workers: List[Worker]
     alerts: Alerts
+    image_base64: Optional[str] = None
     raw_metadata: Dict[str, Any]

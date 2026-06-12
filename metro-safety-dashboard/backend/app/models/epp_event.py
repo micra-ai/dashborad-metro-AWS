@@ -24,4 +24,7 @@ class EppEvent(Base):
     missing_mask_count = Column(Integer, default=0)
     alert_level = Column(String)
     non_compliance_detected = Column(Boolean, default=False)
+    positive_compliance_count = Column(Integer, default=0)
+    negative_compliance_count = Column(Integer, default=0)
+    image_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

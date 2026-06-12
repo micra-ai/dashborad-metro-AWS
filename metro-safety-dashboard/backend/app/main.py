@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database.connection import Base, engine
 import json
+import os
 
 app = FastAPI(title="Metro Safety Dashboard API")
 
@@ -21,6 +23,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Setup Static Files
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+os.makedirs(os.path.join(STATIC_DIR, "images"), exist_ok=True)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+# Mount Frontend UI files over HTTP
+FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
 
 from app.auth.routes import router as auth_router
 from app.api.epp_routes import router as epp_router

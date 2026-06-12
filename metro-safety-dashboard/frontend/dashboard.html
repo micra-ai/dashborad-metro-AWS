@@ -55,6 +55,14 @@
                         <h4>EPP Más Faltante</h4>
                         <p id="epp-missing" style="color: #ef4444">-</p>
                     </div>
+                    <div class="stat-box">
+                        <h4>Cumplimiento Positivo</h4>
+                        <p id="epp-positive" style="color: #10b981">0</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Cumplimiento Negativo</h4>
+                        <p id="epp-negative" style="color: #ef4444">0</p>
+                    </div>
                 </div>
             </section>
 
@@ -79,6 +87,51 @@
                     </div>
                 </div>
             </section>
+        </div>
+
+        <!-- Monitoreo Visual EPP -->
+        <section class="panel images-panel" style="margin-top: 1.5rem;">
+            <h2>Monitoreo Visual EPP (Últimas Detecciones)</h2>
+            <div class="images-container-grid">
+                <div class="image-column">
+                    <h3>Cumplimiento Completo (Últimas 5)</h3>
+                    <div id="compliant-images-list" class="image-list">
+                        <!-- Se llena mediante JS -->
+                    </div>
+                </div>
+                <div class="image-column">
+                    <h3>Incumplimiento de EPP (Últimas 5)</h3>
+                    <div id="non-compliant-images-list" class="image-list">
+                        <!-- Se llena mediante JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal para Visualización de Detalles de Imagen -->
+    <div id="image-modal" class="modal">
+        <div class="modal-content-container">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modal-img" src="" alt="EPP Event Image">
+                </div>
+                <div class="modal-info">
+                    <div>
+                        <h2 id="modal-title">Detalle de Evento</h2>
+                        <div class="modal-info-item"><strong>ID Evento:</strong> <span id="modal-event-id">-</span></div>
+                        <div class="modal-info-item"><strong>Fecha/Hora:</strong> <span id="modal-time">-</span></div>
+                        <div class="modal-info-item"><strong>Ubicación:</strong> <span id="modal-location">-</span></div>
+                        <div class="modal-info-item"><strong>Trabajadores:</strong> <span id="modal-workers">-</span></div>
+                        <div class="modal-info-item"><strong>Cumplimiento:</strong> <span id="modal-compliance">-</span></div>
+                        <div id="modal-missing-container" style="display:none; margin-top: 1.25rem;">
+                            <strong style="color: #ef4444; font-size: 0.9rem;">EPP Faltante:</strong>
+                            <ul id="modal-missing-list" class="modal-info-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -23,6 +23,9 @@ def get_epp_summary(db: Session):
     total_partial = db.query(func.sum(EppEvent.workers_partial_compliance)).scalar() or 0
     avg_compliance = db.query(func.avg(EppEvent.overall_compliance_percentage)).scalar() or 0.0
 
+    total_positive = db.query(func.sum(EppEvent.positive_compliance_count)).scalar() or 0
+    total_negative = db.query(func.sum(EppEvent.negative_compliance_count)).scalar() or 0
+
     missing_ppe_counts = {
         "helmet": db.query(func.sum(EppEvent.missing_helmet_count)).scalar() or 0,
         "gloves": db.query(func.sum(EppEvent.missing_gloves_count)).scalar() or 0,
@@ -37,6 +40,8 @@ def get_epp_summary(db: Session):
         overall_compliance_percentage=avg_compliance,
         workers_full_compliance=total_full,
         workers_partial_compliance=total_partial,
+        positive_compliance_count=total_positive,
+        negative_compliance_count=total_negative,
         most_frequent_missing_ppe=most_frequent if most_frequent and missing_ppe_counts[most_frequent] > 0 else None
     )
 
@@ -53,3 +58,52 @@ def get_excavation_summary(db: Session):
         current_risk_level=current_risk,
         total_alarms_triggered=total_alarms
     )
+
+def get_latest_images(db: Session, limit: int = 5):
+    compliant = db.query(EppEvent).filter(
+        EppEvent.image_url.isnot(None),
+        EppEvent.image_url != "",
+        EppEvent.non_compliance_detected == False
+    ).order_by(EppEvent.timestamp.desc()).limit(limit).all()
+
+    non_compliant = db.query(EppEvent).filter(
+        EppEvent.image_url.isnot(None),
+        EppEvent.image_url != "",
+        EppEvent.non_compliance_detected == True
+    ).order_by(EppEvent.timestamp.desc()).limit(limit).all()
+
+    return {
+        "compliant": [
+            {
+                "event_id": ev.event_id,
+                "timestamp": ev.timestamp.isoformat() if ev.timestamp else None,
+                "site": ev.site,
+                "area": ev.area,
+                "zone": ev.zone,
+                "image_url": ev.image_url,
+                "workers_detected": ev.workers_detected,
+                "workers_full_compliance": ev.workers_full_compliance,
+                "overall_compliance_percentage": ev.overall_compliance_percentage
+            }
+            for ev in compliant
+        ],
+        "non_compliant": [
+            {
+                "event_id": ev.event_id,
+                "timestamp": ev.timestamp.isoformat() if ev.timestamp else None,
+                "site": ev.site,
+                "area": ev.area,
+                "zone": ev.zone,
+                "image_url": ev.image_url,
+                "workers_detected": ev.workers_detected,
+                "workers_full_compliance": ev.workers_full_compliance,
+                "overall_compliance_percentage": ev.overall_compliance_percentage,
+                "missing_helmet_count": ev.missing_helmet_count,
+                "missing_gloves_count": ev.missing_gloves_count,
+                "missing_goggles_count": ev.missing_goggles_count,
+                "missing_reflective_vest_count": ev.missing_reflective_vest_count,
+                "missing_mask_count": ev.missing_mask_count
+            }
+            for ev in non_compliant
+        ]
+    }
