@@ -63,13 +63,92 @@
         }
         tr:hover { background-color: #374151; }
     </style>
+
+
+
+
+
+
+
+<style id="events-sidebar-spacing-fix">
+
+    body .sidebar nav {
+
+        display: flex !important;
+
+        flex-direction: column !important;
+
+        gap: 0 !important;
+
+        width: 100% !important;
+
+    }
+
+
+
+    body .sidebar nav a {
+
+        display: block !important;
+
+        width: 100% !important;
+
+        padding: 13px 16px !important;
+
+        margin: 0 0 14px 0 !important;
+
+        border-radius: 10px !important;
+
+        text-decoration: none !important;
+
+        line-height: 1.25 !important;
+
+        font-size: 1rem !important;
+
+        box-sizing: border-box !important;
+
+        background: transparent !important;
+
+        color: #cbd5e1 !important;
+
+        font-weight: 500 !important;
+
+    }
+
+
+
+    body .sidebar nav a.active {
+
+        background: #374151 !important;
+
+        color: #ffffff !important;
+
+        font-weight: 800 !important;
+
+    }
+
+
+
+    body .sidebar nav a:hover {
+
+        background: #374151 !important;
+
+        color: #ffffff !important;
+
+    }
+
+</style>
+
+
+<script src="js/time_chile.js"></script>
 </head>
 <body>
     <div class="sidebar">
         <div class="logo">Metro Visión</div>
         <ul class="nav-links">
             <li><a href="dashboard.html">Dashboard</a></li>
-            <li class="active"><a href="events.html">Histórico de Eventos</a></li>
+            <li class="active"><a href="events.html">Histórico de Eventos</a>
+            <a href="images.html">Imágenes EPP</a>
+            <a href="kpi_validation.html">Validación KPI</a></li>
             <li><a href="#" onclick="logout()">Cerrar Sesión</a></li>
         </ul>
     </div>
@@ -115,5 +194,6 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/events.js"></script>
+<script src="js/user_sidebar.js"></script>
 </body>
 </html>

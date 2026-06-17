@@ -19,8 +19,8 @@ async function fetchAPI(endpoint, options = {}) {
 
     if (response.status === 401) {
         localStorage.removeItem('token');
-        if (!window.location.pathname.endsWith('login.html')) {
-            window.location.href = 'login.html';
+        if (!window.location.pathname.endsWith('/login.html')) {
+            window.location.href = '/login.html';
         }
         return null;
     }

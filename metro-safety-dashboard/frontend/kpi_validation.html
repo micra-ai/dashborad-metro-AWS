@@ -1,0 +1,618 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Validación KPI - Metro Visión</title>
+
+  <script src="js/config.js"></script>
+
+  <script src="js/auth.js"></script>
+
+
+
+  <style>
+
+    * { box-sizing: border-box; }
+
+
+
+    body {
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      background: #0f172a;
+
+      color: #e5e7eb;
+
+      font-family: Arial, Helvetica, sans-serif;
+
+      overflow-x: hidden;
+
+    }
+
+
+
+    .sidebar {
+
+      position: fixed;
+
+      left: 0;
+
+      top: 0;
+
+      width: 260px;
+
+      height: 100vh;
+
+      background: #1f2937;
+
+      padding: 36px 22px 24px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      box-shadow: 8px 0 20px rgba(0,0,0,.18);
+
+    }
+
+
+
+    .sidebar h2 {
+
+      margin: 0 0 42px;
+
+      color: #ef233c;
+
+      font-size: 1.8rem;
+
+      font-weight: 900;
+
+      text-align: center;
+
+    }
+
+
+
+    .sidebar nav {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 12px;
+
+    }
+
+
+
+    .sidebar nav a {
+
+      color: #cbd5e1;
+
+      text-decoration: none;
+
+      padding: 13px 16px;
+
+      border-radius: 10px;
+
+      font-size: 1rem;
+
+      transition: .2s;
+
+    }
+
+
+
+    .sidebar nav a:hover,
+
+    .sidebar nav a.active {
+
+      background: #374151;
+
+      color: #ffffff;
+
+    }
+
+
+
+    .main-content {
+
+      margin-left: 260px;
+
+      padding: 38px 44px;
+
+      min-height: 100vh;
+
+      background: #0f172a;
+
+    }
+
+
+
+    .page-header h1 {
+
+      margin: 0;
+
+      color: #ffffff;
+
+      font-size: 2rem;
+
+      font-weight: 900;
+
+    }
+
+
+
+    .page-header p {
+
+      margin: 10px 0 0;
+
+      color: #94a3b8;
+
+      font-size: 1rem;
+
+      line-height: 1.5;
+
+    }
+
+
+
+    .summary-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+
+      gap: 16px;
+
+      margin: 28px 0;
+
+    }
+
+
+
+    .summary-card,
+
+    .validation-panel {
+
+      background: #1f2937;
+
+      border-radius: 14px;
+
+      border: 1px solid rgba(148,163,184,.12);
+
+      box-shadow: 0 8px 18px rgba(0,0,0,.16);
+
+    }
+
+
+
+    .summary-card {
+
+      padding: 20px;
+
+    }
+
+
+
+    .summary-card h3 {
+
+      margin: 0 0 10px;
+
+      color: #cbd5e1;
+
+      font-size: .92rem;
+
+    }
+
+
+
+    .summary-card .value {
+
+      color: #ffffff;
+
+      font-size: 1.6rem;
+
+      font-weight: 900;
+
+    }
+
+
+
+    .summary-card .muted {
+
+      color: #94a3b8;
+
+      font-size: .82rem;
+
+      margin-top: 8px;
+
+      line-height: 1.35;
+
+    }
+
+
+
+    .validation-panel {
+
+      padding: 24px;
+
+      margin-top: 24px;
+
+    }
+
+
+
+    .validation-panel h2 {
+
+      margin: 0 0 8px;
+
+      color: #ffffff;
+
+      font-size: 1.35rem;
+
+      font-weight: 900;
+
+    }
+
+
+
+    .validation-panel p {
+
+      margin: 0 0 18px;
+
+      color: #94a3b8;
+
+    }
+
+
+
+    table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      background: #111827;
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+    }
+
+
+
+    th, td {
+
+      padding: 16px;
+
+      border-bottom: 1px solid rgba(148,163,184,.15);
+
+      text-align: left;
+
+      font-size: .9rem;
+
+    }
+
+
+
+    th {
+
+      color: #cbd5e1;
+
+      font-weight: 900;
+
+    }
+
+
+
+    td {
+
+      color: #e5e7eb;
+
+    }
+
+
+
+    .status {
+
+      display: inline-flex;
+
+      padding: 5px 10px;
+
+      border-radius: 999px;
+
+      font-size: .72rem;
+
+      font-weight: 900;
+
+      white-space: nowrap;
+
+    }
+
+
+
+    .validation {
+
+      background: rgba(245,158,11,.15);
+
+      color: #f59e0b;
+
+      border: 1px solid rgba(245,158,11,.3);
+
+    }
+
+
+
+    .pending {
+
+      background: rgba(148,163,184,.15);
+
+      color: #cbd5e1;
+
+      border: 1px solid rgba(148,163,184,.3);
+
+    }
+
+
+
+    .ok {
+
+      background: rgba(34,197,94,.15);
+
+      color: #22c55e;
+
+      border: 1px solid rgba(34,197,94,.3);
+
+    }
+
+
+
+    .note {
+
+      margin-top: 22px;
+
+      background: #111827;
+
+      border: 1px solid rgba(59,130,246,.22);
+
+      border-radius: 12px;
+
+      padding: 18px;
+
+      color: #cbd5e1;
+
+      line-height: 1.45;
+
+    }
+
+
+
+    @media (max-width: 1300px) {
+
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    }
+
+  </style>
+
+<script src="js/time_chile.js"></script>
+</head>
+
+
+
+<body>
+
+  <aside class="sidebar">
+
+        <h2>Metro Visión</h2>
+
+        <nav>
+
+            <a href="dashboard.html">Dashboard</a>
+            <a href="events.html">Histórico de Eventos</a>
+            <a href="images.html">Imágenes EPP</a>
+            <a href="kpi_validation.html" class="active">Validación KPI</a>
+
+        </nav>
+
+    </aside>
+
+
+
+  <main class="main-content">
+
+    <header class="page-header">
+
+      <h1>Validación KPI del Piloto</h1>
+
+      <p>
+
+        Seguimiento formal de las metas comprometidas y sus resultados reales durante la ejecución del piloto Metro Visión.
+
+      </p>
+
+    </header>
+
+
+
+    <section class="summary-grid">
+
+      <div class="summary-card">
+
+        <h3>KPIs definidos</h3>
+
+        <div class="value">4</div>
+
+        <div class="muted">Indicadores formales asociados al piloto.</div>
+
+      </div>
+
+
+
+      <div class="summary-card">
+
+        <h3>KPIs en validación</h3>
+
+        <div class="value">2</div>
+
+        <div class="muted">Requieren revisión humana o dataset etiquetado.</div>
+
+      </div>
+
+
+
+      <div class="summary-card">
+
+        <h3>KPIs pendientes</h3>
+
+        <div class="value">1</div>
+
+        <div class="muted">Pendiente de comparación contra proceso manual.</div>
+
+      </div>
+
+
+
+      <div class="summary-card">
+
+        <h3>KPIs operativos</h3>
+
+        <div class="value">1</div>
+
+        <div class="muted">Sistema funcionando y en medición continua.</div>
+
+      </div>
+
+    </section>
+
+
+
+    <section class="validation-panel">
+
+      <h2>Historial de validación</h2>
+
+      <p>Los resultados se completarán a medida que se validen contra revisión humana, datos etiquetados o medición operacional.</p>
+
+
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>KPI</th>
+
+            <th>Meta</th>
+
+            <th>Resultado actual</th>
+
+            <th>Método de validación</th>
+
+            <th>Estado</th>
+
+            <th>Última medición</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr>
+
+            <td>Precisión detección uso de EPP</td>
+
+            <td>≥ 85%</td>
+
+            <td>Pendiente</td>
+
+            <td>Revisión humana / dataset etiquetado</td>
+
+            <td><span class="status validation">En validación</span></td>
+
+            <td>Por iniciar</td>
+
+          </tr>
+
+          <tr>
+
+            <td>Precisión detección de desprendimientos</td>
+
+            <td>≥ 85%</td>
+
+            <td>Pendiente</td>
+
+            <td>Revisión de eventos detectados</td>
+
+            <td><span class="status validation">En validación</span></td>
+
+            <td>Por iniciar</td>
+
+          </tr>
+
+          <tr>
+
+            <td>Reducción del tiempo de reporte</td>
+
+            <td>≥ 30%</td>
+
+            <td>Pendiente</td>
+
+            <td>Comparación proceso manual vs plataforma</td>
+
+            <td><span class="status pending">Pendiente</span></td>
+
+            <td>Por iniciar</td>
+
+          </tr>
+
+          <tr>
+
+            <td>Disponibilidad sistema local + nube</td>
+
+            <td>≥ 99%</td>
+
+            <td>En medición</td>
+
+            <td>Continuidad operacional</td>
+
+            <td><span class="status ok">Operativo</span></td>
+
+            <td>Durante piloto</td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+
+
+      <div class="note">
+
+        <strong>Nota técnica:</strong> El dashboard muestra métricas operacionales reales recibidas por la API. Esta pestaña muestra dónde se irán registrando los resultados formales de validación KPI.
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+
+<script src="js/user_sidebar.js"></script>
+</body>
+
+</html>
