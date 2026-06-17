@@ -1,2 +1,2 @@
-const API_BASE_URL = "http://localhost:8000";
+window.API_BASE_URL = "/api";
 const DASHBOARD_REFRESH_INTERVAL_MS = 5000;

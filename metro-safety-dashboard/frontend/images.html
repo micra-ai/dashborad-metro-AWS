@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Imágenes EPP - Metro Visión</title>
+
+    <script src="js/config.js"></script>
+
+    <script src="js/auth.js"></script>
+
+
+
+    <style>
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            background: #0f172a;
+
+            color: #e5e7eb;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            overflow-x: hidden;
+
+        }
+
+
+
+        .sidebar {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 260px;
+
+            height: 100vh;
+
+            background: #1f2937;
+
+            padding: 32px 24px;
+
+            border-right: 1px solid rgba(148, 163, 184, 0.12);
+
+        }
+
+
+
+        .sidebar h2 {
+
+            margin: 0 0 36px 0;
+
+            color: #ef233c;
+
+            font-size: 1.8rem;
+
+            font-weight: 800;
+
+        }
+
+
+
+        .sidebar nav {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+
+        }
+
+
+
+        .sidebar nav a {
+
+            color: #cbd5e1;
+
+            text-decoration: none;
+
+            padding: 14px 18px;
+
+            border-radius: 8px;
+
+            font-size: 1rem;
+
+            transition: all 0.2s ease;
+
+        }
+
+
+
+        .sidebar nav a:hover,
+
+        .sidebar nav a.active {
+
+            background: #374151;
+
+            color: #ffffff;
+
+        }
+
+
+
+        .main-content {
+
+            margin-left: 260px;
+
+            padding: 36px 42px;
+
+            min-height: 100vh;
+
+        }
+
+
+
+        .page-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            gap: 24px;
+
+            margin-bottom: 28px;
+
+        }
+
+
+
+        .page-title h1 {
+
+            margin: 0;
+
+            color: #f9fafb;
+
+            font-size: 2rem;
+
+            font-weight: 800;
+
+            letter-spacing: 0.2px;
+
+        }
+
+
+
+        .page-title p {
+
+            margin: 8px 0 0 0;
+
+            color: #94a3b8;
+
+            font-size: 1rem;
+
+            line-height: 1.5;
+
+        }
+
+
+
+        .refresh-pill {
+
+            background: #1f2937;
+
+            color: #cbd5e1;
+
+            padding: 10px 14px;
+
+            border-radius: 999px;
+
+            font-size: 0.85rem;
+
+            border: 1px solid rgba(148, 163, 184, 0.14);
+
+            white-space: nowrap;
+
+        }
+
+
+
+        .epp-images-section {
+
+            background: #1f2937;
+
+            border-radius: 16px;
+
+            padding: 26px;
+
+            box-shadow: 0 14px 28px rgba(0,0,0,.22);
+
+            border: 1px solid rgba(148,163,184,.10);
+
+        }
+
+
+
+        .epp-images-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 16px;
+
+            margin-bottom: 22px;
+
+            padding-bottom: 16px;
+
+            border-bottom: 1px solid rgba(148,163,184,.18);
+
+        }
+
+
+
+        .epp-images-title {
+
+            margin: 0;
+
+            color: #f9fafb;
+
+            font-size: 1.45rem;
+
+            font-weight: 800;
+
+        }
+
+
+
+        .epp-images-subtitle {
+
+            margin: 5px 0 0 0;
+
+            color: #94a3b8;
+
+            font-size: .92rem;
+
+        }
+
+
+
+        .epp-images-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+
+            gap: 20px;
+
+        }
+
+
+
+        .epp-image-card {
+
+            background: #111827;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            border: 1px solid rgba(148,163,184,.12);
+
+            box-shadow: 0 10px 20px rgba(0,0,0,.20);
+
+        }
+
+
+
+        .epp-image-card img {
+
+            width: 100%;
+
+            height: 220px;
+
+            object-fit: cover;
+
+            display: block;
+
+            background: #020617;
+
+            cursor: pointer;
+
+        }
+
+
+
+        .epp-image-info {
+
+            padding: 16px;
+
+        }
+
+
+
+        .epp-image-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+
+        .epp-device {
+
+            color: #f9fafb;
+
+            font-weight: 800;
+
+            font-size: .95rem;
+
+        }
+
+
+
+        .epp-alert-badge {
+
+            font-size: .72rem;
+
+            font-weight: 800;
+
+            padding: 5px 10px;
+
+            border-radius: 999px;
+
+            letter-spacing: .3px;
+
+        }
+
+
+
+        .epp-alert-high {
+
+            background: rgba(239,68,68,.16);
+
+            color: #ef4444;
+
+        }
+
+
+
+        .epp-alert-low {
+
+            background: rgba(34,197,94,.16);
+
+            color: #22c55e;
+
+        }
+
+
+
+        .epp-alert-info {
+
+            background: rgba(59,130,246,.16);
+
+            color: #3b82f6;
+
+        }
+
+
+
+        .epp-summary {
+
+            color: #cbd5e1;
+
+            font-size: .9rem;
+
+            line-height: 1.35rem;
+
+            min-height: 40px;
+
+        }
+
+
+
+        .epp-time {
+
+            margin-top: 12px;
+
+            color: #94a3b8;
+
+            font-size: .8rem;
+
+        }
+
+
+
+        .epp-empty {
+
+            background: #111827;
+
+            border-radius: 14px;
+
+            padding: 28px;
+
+            color: #9ca3af;
+
+            font-size: .95rem;
+
+            border: 1px dashed rgba(148,163,184,.25);
+
+        }
+
+
+
+        .epp-modal {
+
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(2,6,23,.88);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            z-index: 9999;
+
+            padding: 24px;
+
+        }
+
+
+
+        .epp-modal img {
+
+            max-width: 92vw;
+
+            max-height: 86vh;
+
+            border-radius: 14px;
+
+            box-shadow: 0 22px 50px rgba(0,0,0,.55);
+
+        }
+
+
+
+        @media (max-width: 1300px) {
+
+            .epp-images-grid {
+
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+
+            }
+
+        }
+
+
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+
+                position: relative;
+
+                width: 100%;
+
+                height: auto;
+
+            }
+
+
+
+            .main-content {
+
+                margin-left: 0;
+
+                padding: 24px;
+
+            }
+
+
+
+            .page-header {
+
+                flex-direction: column;
+
+            }
+
+
+
+            .epp-images-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+    </style>
+
+<script src="js/time_chile.js"></script>
+</head>
+
+
+
+<body>
+
+    <aside class="sidebar">
+
+        <h2>Metro Visión</h2>
+
+        <nav>
+
+            <a href="dashboard.html">Dashboard</a>
+            <a href="events.html">Histórico de Eventos</a>
+            <a href="images.html" class="active">Imágenes EPP</a>
+            <a href="kpi_validation.html">Validación KPI</a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <main class="main-content">
+
+        <header class="page-header">
+
+            <div class="page-title">
+
+                <h1>Imágenes procesadas EPP</h1>
+
+                <p>Evidencia visual asociada a eventos recientes de detección de elementos de protección personal.</p>
+
+            </div>
+
+
+
+            <div class="refresh-pill">
+
+                Actualización automática cada 10 segundos
+
+            </div>
+
+        </header>
+
+
+
+        <section id="epp-images-section" class="epp-images-section">
+
+            <div class="epp-empty">
+
+                Cargando imágenes procesadas...
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <script src="js/epp_images.js"></script>
+
+<script src="js/user_sidebar.js"></script>
+<script src="js/images_download_buttons.js"></script>
+</body>
+
+</html>
