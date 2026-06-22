@@ -183,7 +183,7 @@
 
 
 
-            const response = await fetch(`${API}/dashboard/latest-images`, {
+            const response = await fetch(`${API}/dashboard/latest-images?limit=20`, {
 
                 headers
 
