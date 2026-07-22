@@ -17,6 +17,7 @@ class ExcavationEvent(Base):
     landslide_detected = Column(Boolean, default=False)
     landslide_count = Column(Integer, default=0)
     movement_detected = Column(Boolean, default=False)
+    avance_metros = Column(Float, default=0.0)
     risk_level = Column(String)
     confidence = Column(Float, default=0.0)
     alarm_triggered = Column(Boolean, default=False)

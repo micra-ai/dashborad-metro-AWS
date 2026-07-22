@@ -16,7 +16,12 @@ class EppSummary(BaseModel):
     most_frequent_missing_ppe: Optional[str]
 
 class ExcavationSummary(BaseModel):
-    total_large_rocks_detections: int
-    total_landslide_detections: int
-    current_risk_level: str
-    total_alarms_triggered: int
+    rocas_detectadas: int = 0
+    deslizamientos: int = 0
+    avance_metros: float = 0.0
+    device_status: str = "Offline"
+    last_seen: Optional[str] = None
+    total_large_rocks_detections: int = 0
+    total_landslide_detections: int = 0
+    current_risk_level: str = "LOW"
+    total_alarms_triggered: int = 0

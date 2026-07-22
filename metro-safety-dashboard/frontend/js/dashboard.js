@@ -17,13 +17,18 @@ async function loadDashboardData() {
 
         const exc = await fetchAPI('/api/dashboard/excavation');
         if (exc) {
-            const riskBadge = document.getElementById('exc-risk-level');
-            riskBadge.innerText = exc.current_risk_level;
-            riskBadge.className = 'risk-badge risk-' + exc.current_risk_level;
+            const statusBadge = document.getElementById('exc-device-status');
+            if (statusBadge) {
+                const isOnline = exc.device_status === 'Online';
+                statusBadge.innerText = isOnline ? 'Online' : 'Offline';
+                statusBadge.style.backgroundColor = isOnline ? '#22c55e' : '#ef4444';
+                statusBadge.style.color = '#ffffff';
+                statusBadge.style.fontWeight = 'bold';
+            }
             
-            document.getElementById('exc-rocks').innerText = exc.total_large_rocks_detections;
-            document.getElementById('exc-landslides').innerText = exc.total_landslide_detections;
-            document.getElementById('exc-alarms').innerText = exc.total_alarms_triggered;
+            if (document.getElementById('exc-rocks')) document.getElementById('exc-rocks').innerText = exc.rocas_detectadas ?? 0;
+            if (document.getElementById('exc-landslides')) document.getElementById('exc-landslides').innerText = exc.deslizamientos ?? 0;
+            if (document.getElementById('exc-advance')) document.getElementById('exc-advance').innerText = (exc.avance_metros || 0).toFixed(1) + ' m';
         }
     } catch (err) {
         console.error("Error loading dashboard data:", err);

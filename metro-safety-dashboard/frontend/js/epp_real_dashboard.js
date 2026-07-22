@@ -598,104 +598,70 @@ function formatUtcToChile(value) {
 
 
             setCard(
-
                 "epp-missing",
-
                 "Nivel de alerta EPP predominante",
-
                 data.dominant_alert_level,
-
                 `Nivel más recurrente en eventos EPP recientes (${data.dominant_alert_count} registros)`,
-
                 data.dominant_alert_level === "HIGH" ? "#ef4444" : "#f59e0b"
-
             );
-
-
-
-            setCard(
-
-                "exc-risk-level",
-
-                "Nivel de riesgo actual",
-
-                document.getElementById("exc-risk-level")?.textContent || "LOW",
-
-                "Estado reportado por el monitoreo actual",
-
-                "#22c55e"
-
-            );
-
-
-
-            setCard(
-
-                "exc-rocks",
-
-                "Rocas grandes detectadas",
-
-                document.getElementById("exc-rocks")?.textContent || "0",
-
-                "Eventos detectados en frente de trabajo"
-
-            );
-
-
-
-            setCard(
-
-                "exc-landslides",
-
-                "Deslizamientos detectados",
-
-                document.getElementById("exc-landslides")?.textContent || "0",
-
-                "Eventos críticos detectados"
-
-            );
-
-
-
-            setCard(
-
-                "exc-alarms",
-
-                "Alertas activadas",
-
-                document.getElementById("exc-alarms")?.textContent || "0",
-
-                "Alertas generadas por condición de riesgo",
-
-                "#ef4444"
-
-            );
-
-
 
             const lastUpdate = document.getElementById("last-update");
-
             if (lastUpdate) {
-
                 lastUpdate.textContent = formatDate(data.latest_timestamp);
-
             }
 
-
-
             renderCompactBreakdown(data);
-
-
-
         } catch (error) {
-
             console.error("No se pudieron cargar métricas EPP:", error);
-
         }
-
     }
 
+    async function loadExcavationMetrics() {
+        try {
+            const token = localStorage.getItem("token");
+            const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+            const response = await fetch(`${API}/dashboard/excavation`, { headers });
+            if (!response.ok) return;
 
+            const data = await response.json();
+
+            const statusEl = document.getElementById("exc-device-status");
+            if (statusEl) {
+                const isOnline = data.device_status === "Online";
+                statusEl.textContent = isOnline ? "Online" : "Offline";
+                statusEl.style.backgroundColor = isOnline ? "#22c55e" : "#ef4444";
+                statusEl.style.color = "#ffffff";
+                statusEl.style.fontWeight = "bold";
+                statusEl.style.padding = "4px 8px";
+                statusEl.style.borderRadius = "4px";
+            }
+
+            setCard(
+                "exc-rocks",
+                "Rocas detectadas",
+                data.rocas_detectadas ?? 0,
+                "Rocas detectadas en el túnel"
+            );
+
+            setCard(
+                "exc-landslides",
+                "Deslizamientos",
+                data.deslizamientos ?? 0,
+                "Eventos de desprendimiento",
+                data.deslizamientos > 0 ? "#ef4444" : "#ffffff"
+            );
+
+            setCard(
+                "exc-advance",
+                "Avance (Metros)",
+                `${Number(data.avance_metros || 0).toFixed(1)} m`,
+                "Distancia de avance medida",
+                "#3b82f6"
+            );
+        } catch (err) {
+            console.error("Error cargando telemetria de excavacion:", err);
+        }
+    }
 
     document.addEventListener("DOMContentLoaded", function () {
 
@@ -704,8 +670,12 @@ function formatUtcToChile(value) {
         setHeading();
 
         loadEppMetrics();
+        loadExcavationMetrics();
 
-        setInterval(loadEppMetrics, 5000);
+        setInterval(function() {
+            loadEppMetrics();
+            loadExcavationMetrics();
+        }, 5000);
 
     });
 
