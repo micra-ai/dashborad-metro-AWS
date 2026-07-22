@@ -38,6 +38,7 @@ if os.path.exists(FRONTEND_DIR):
 from app.auth.routes import router as auth_router
 from app.api.epp_routes import router as epp_router
 from app.api.excavation_routes import router as excavation_router
+from app.api.milesight_routes import router as milesight_router
 from app.api.dashboard_routes import router as dashboard_router
 from app.api.events_routes import router as events_router
 from app.api.export_routes import router as export_router
@@ -45,6 +46,7 @@ from app.api.export_routes import router as export_router
 app.include_router(auth_router)
 app.include_router(epp_router)
 app.include_router(excavation_router)
+app.include_router(milesight_router)
 app.include_router(dashboard_router)
 app.include_router(events_router)
 app.include_router(export_router)

@@ -4,12 +4,12 @@ from app.models.epp_event import EppEvent
 from app.models.excavation_event import ExcavationEvent
 from app.models.raw_event import RawEvent
 from app.schemas.dashboard_schema import DashboardSummary, EppSummary, ExcavationSummary
-from datetime import datetime
+from datetime import datetime, timezone
 
 def get_dashboard_summary(db: Session):
     total_events = db.query(RawEvent).count()
     last_event = db.query(RawEvent).order_by(RawEvent.received_at.desc()).first()
-    last_update = last_event.received_at.isoformat() if last_event else datetime.utcnow().isoformat()
+    last_update = last_event.received_at.isoformat() if last_event else datetime.now(timezone.utc).isoformat()
     active_devices = db.query(RawEvent.device_id).distinct().count()
     return DashboardSummary(
         total_events=total_events,
@@ -46,13 +46,40 @@ def get_epp_summary(db: Session):
     )
 
 def get_excavation_summary(db: Session):
+    last_event = db.query(ExcavationEvent).order_by(ExcavationEvent.timestamp.desc()).first()
+    
+    device_status = "Offline"
+    last_seen = None
+    rocas = 0
+    deslizamientos = 0
+    avance = 0.0
+
+    if last_event:
+        last_seen = last_event.timestamp.isoformat() if last_event.timestamp else None
+        rocas = getattr(last_event, "large_rocks_count", 0) or 0
+        deslizamientos = getattr(last_event, "landslide_count", 0) or 0
+        avance = getattr(last_event, "avance_metros", 0.0) or 0.0
+
+        if last_event.timestamp:
+            ts = last_event.timestamp
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            now = datetime.now(timezone.utc)
+            seconds_diff = (now - ts).total_seconds()
+            if 0 <= seconds_diff <= 900:  # 15 minutes = 900 seconds
+                device_status = "Online"
+
     total_rocks = db.query(ExcavationEvent).filter(ExcavationEvent.large_rocks_detected == True).count()
     total_landslides = db.query(ExcavationEvent).filter(ExcavationEvent.landslide_detected == True).count()
     total_alarms = db.query(ExcavationEvent).filter(ExcavationEvent.alarm_triggered == True).count()
-    last_event = db.query(ExcavationEvent).order_by(ExcavationEvent.timestamp.desc()).first()
     current_risk = last_event.risk_level if last_event else "LOW"
 
     return ExcavationSummary(
+        rocas_detectadas=rocas,
+        deslizamientos=deslizamientos,
+        avance_metros=avance,
+        device_status=device_status,
+        last_seen=last_seen,
         total_large_rocks_detections=total_rocks,
         total_landslide_detections=total_landslides,
         current_risk_level=current_risk,
