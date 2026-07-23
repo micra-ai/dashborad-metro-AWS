@@ -16,7 +16,8 @@
             <li class="active"><a href="dashboard.html">Dashboard</a></li>
             <li><a href="events.html">Histórico de Eventos</a>
             <a href="images.html">Imágenes EPP</a>
-            <a href="kpi_validation.html">Validación KPI</a></li>
+            <a href="kpi_validation.html">Validación KPI</a>
+      <a href="dashboard.html?tunnel=1" id="tab-tunnel">Túnel / LoRaWAN</a></li>
             <li><a href="#" onclick="logout()">Cerrar Sesión</a></li>
         </ul>
     </div>
@@ -63,14 +64,14 @@
             </section>
 
             <section class="panel excavation-panel">
-                <h2>Monitoreo Dispositivo Interior Túnel (Gateway LoRaWAN)</h2>
+                <h2>Control Frente de Trabajo / Excavación </h2>
                 <div class="panel-grid">
                     <div class="stat-box">
-                        <h4>Estado Dispositivo</h4>
-                        <p id="exc-device-status" class="risk-badge" style="background-color: #374151; color: #9ca3af;">Checking...</p>
+                        <h4>Nivel de Riesgo Actual</h4>
+                        <p id="exc-risk-level" class="risk-badge risk-LOW">LOW</p>
                     </div>
                     <div class="stat-box">
-                        <h4>Rocas Detectadas</h4>
+                        <h4>Rocas Grandes</h4>
                         <p id="exc-rocks">0</p>
                     </div>
                     <div class="stat-box">
@@ -78,8 +79,8 @@
                         <p id="exc-landslides">0</p>
                     </div>
                     <div class="stat-box">
-                        <h4>Avance (Metros)</h4>
-                        <p id="exc-advance" style="color: #3b82f6">0.0 m</p>
+                        <h4>Alarmas Activadas</h4>
+                        <p id="exc-alarms" style="color: #ef4444">0</p>
                     </div>
                 </div>
             </section>
@@ -89,10 +90,10 @@
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
-<script src="js/epp_real_dashboard.js?v=20260605_4"></script>
+<script src="js/epp_real_dashboard.js?v=20260630_2"></script>
+<script src="js/hide_tunnel_card.js?v=5"></script>
 <script src="js/kpi_piloto.js"></script>
 <script src="js/user_sidebar.js"></script>
-<script src="js/last_update_fix.js"></script>
-<script src="js/last_update_chile_fix.js"></script>
+<script src="js/tunnel_tab.js?v=46"></script>
 </body>
 </html>

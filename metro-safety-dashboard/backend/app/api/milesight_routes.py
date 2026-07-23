@@ -115,13 +115,99 @@ def process_milesight_payload(payload: MilesightUplinkPayload, db: Session):
     }
 
 @router.post("/api/v1/lorawan/milesight-ug65", status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_milesight_token)])
-def receive_milesight_telemetry(payload: MilesightUplinkPayload, db: Session = Depends(get_db)):
+
+def receive_milesight_telemetry(payload: dict, db: Session = Depends(get_db)):
+
     try:
-        return process_milesight_payload(payload, db)
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno al procesar telemetria: {str(e)}"
+
+        print("PAYLOAD_REAL_MILESIGHT:", payload)
+
+
+
+        dev_eui = (
+
+            payload.get("devEUI")
+
+            or payload.get("devEui")
+
+            or payload.get("deviceEUI")
+
+            or payload.get("device_eui")
+
+            or payload.get("deviceInfo", {}).get("devEui")
+
+            or payload.get("deviceInfo", {}).get("devEUI")
+
+            or payload.get("end_device_ids", {}).get("dev_eui")
+
         )
+
+
+
+        obj = (
+
+            payload.get("object")
+
+            or payload.get("decoded_payload")
+
+            or payload.get("decodedPayload")
+
+            or payload
+
+        )
+
+
+
+        rx = payload.get("rxInfo") or payload.get("rx_info") or []
+
+        first_rx = rx[0] if isinstance(rx, list) and rx else {}
+
+
+
+        normalized = MilesightUplinkPayload(
+
+            event=payload.get("event", "uplink"),
+
+            devEUI=dev_eui or "A8404180C45D1554",
+
+            deviceName=payload.get("deviceName") or payload.get("deviceInfo", {}).get("deviceName"),
+
+            applicationName=payload.get("applicationName") or payload.get("deviceInfo", {}).get("applicationName") or "Metro_Rocas",
+
+            fPort=payload.get("fPort") or payload.get("f_port") or payload.get("port") or 2,
+
+            fCnt=payload.get("fCnt") or payload.get("f_cnt") or payload.get("fcnt") or 0,
+
+            rssi=payload.get("rssi") or first_rx.get("rssi") or 0,
+
+            snr=payload.get("snr") or first_rx.get("loRaSNR") or first_rx.get("snr") or 0,
+
+            data=payload.get("data") or payload.get("frm_payload"),
+
+            object=obj if isinstance(obj, dict) else payload,
+
+            timestamp=payload.get("timestamp") if isinstance(payload.get("timestamp"), int) else None,
+
+        )
+
+
+
+        return process_milesight_payload(normalized, db)
+
+
+
+    except HTTPException as he:
+
+        raise he
+
+    except Exception as e:
+
+        raise HTTPException(
+
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+
+            detail=f"Error interno al procesar telemetria Milesight: {str(e)}"
+
+        )
+
+
