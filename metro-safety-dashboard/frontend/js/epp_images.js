@@ -227,3 +227,84 @@
 
 })();
 
+
+
+
+async function exportImagesCSV() {
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+
+
+        const response = await fetch(
+
+            `${window.API_BASE_URL}/export/images-csv`,
+
+            {
+
+                headers: token
+
+                    ? { Authorization: `Bearer ${token}` }
+
+                    : {},
+
+            }
+
+        );
+
+
+
+        if (response.status === 401) {
+
+            localStorage.removeItem("token");
+
+            window.location.href = "/login.html";
+
+            return;
+
+        }
+
+
+
+        if (!response.ok) {
+
+            throw new Error(`Error HTTP ${response.status}`);
+
+        }
+
+
+
+        const blob = await response.blob();
+
+        const downloadUrl = window.URL.createObjectURL(blob);
+
+
+
+        const link = document.createElement("a");
+
+        link.href = downloadUrl;
+
+        link.download = `listado_imagenes_epp_${Date.now()}.csv`;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+
+
+        window.URL.revokeObjectURL(downloadUrl);
+
+    } catch (error) {
+
+        console.error("Error descargando listado de imágenes:", error);
+
+        alert("No fue posible descargar el listado de imágenes.");
+
+    }
+
+}
+
