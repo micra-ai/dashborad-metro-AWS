@@ -1,10 +1,836 @@
-<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Metro L9 · Control operacional</title><link rel="stylesheet" href="css/linea9.css?v=3"></head><body>
-<aside><div class="brand"><i>L9</i><div><b>METRO</b><small>Control operacional</small></div></div><div class="site-chip"><span></span><div><small>OBRA ACTIVA</small><b>Línea 9 · Frente Norte</b></div></div><nav><button class="active" data-view="summary"><i>⌂</i><span>Resumen</span></button><button data-view="epp"><i>◉</i><span>Control de EPP</span></button><button data-view="cycle"><i>◷</i><span>Ciclo de excavación</span></button><button data-view="evidence"><i>▣</i><span>Evidencias</span></button><button data-view="history"><i>≡</i><span>Historial</span></button></nav><footer><span class="online-dot"></span><div><b>Sistemas conectados</b><small>Cámara EPP · Gateway LoRa</small></div><button onclick="logout()">Salir</button></footer></aside>
-<main><header><div><p>OPERACIÓN / LÍNEA 9</p><h1 id="title">Resumen operacional</h1></div><div class="header-actions"><span id="last-update">Sincronizando…</span><button id="refresh">↻ Actualizar</button></div></header><div class="content">
-<section id="summary" class="view active"><div class="status-bar"><span class="pulse"></span><b id="connection">Consultando AWS…</b><small>Actualización automática cada 5 segundos</small></div><div class="kpis"><article><span class="kpi-icon green">✓</span><div><label>Cumplimiento EPP</label><strong id="sum-epp">—</strong><small>Casco y chaleco · 24 h</small></div></article><article><span class="kpi-icon amber">◷</span><div><label>Hito en ejecución</label><strong class="small" id="sum-stage">Sin ciclo activo</strong><small id="sum-stage-time">—</small></div></article><article><span class="kpi-icon blue">↻</span><div><label>Duración del ciclo</label><strong id="sum-duration">—</strong><small>Tiempo transcurrido</small></div></article><article><span class="kpi-icon orange">↗</span><div><label>Avance registrado</label><strong id="sum-advance">—</strong><small>Acumulado del túnel</small></div></article></div>
-<div class="operations-grid"><article class="panel visual-panel"><div class="panel-head"><div><span class="eyebrow">VISIÓN COMPUTACIONAL</span><h2>Última evidencia EPP</h2></div><span class="live-tag">● EN LÍNEA</span></div><div class="camera-frame"><img id="live-epp-image" alt="Última detección EPP"><div id="camera-empty" class="camera-empty"><span>◉</span><b>Esperando imagen procesada</b><small>La próxima detección aparecerá automáticamente</small></div><div class="camera-overlay"><span id="camera-location">Cámara EPP · Frente Norte</span><time id="camera-time"></time></div></div><div class="epp-summary"><div><span id="live-epp-status" class="shield">✓</span><p><b id="live-epp-title">Monitoreo EPP activo</b><small id="live-epp-meta">Casco y chaleco reflectante</small></p></div><a href="images.html">Ver todas las imágenes →</a></div></article><article class="panel cycle-panel"><div class="panel-head"><div><span class="eyebrow">DATOS DEL TÚNEL · LORA</span><h2 id="cycle-name">Ciclo activo</h2></div><span class="lora-tag">⌁ LoRa</span></div><p id="cycle-meta" class="panel-meta">Esperando inicio de ciclo</p><div id="stage-list" class="stages"><p class="empty">Los hitos aparecerán cuando el PC del túnel envíe eventos.</p></div></article></div>
-<div class="lower-grid"><article class="panel"><div class="panel-head"><div><span class="eyebrow">PRODUCTIVIDAD</span><h2>Tiempo real versus objetivo</h2></div><small>Últimos cinco ciclos</small></div><div id="chart" class="chart"><p class="empty">Sin ciclos terminados</p></div><div class="legend"><span><i></i>Objetivo</span><span><i class="real"></i>Tiempo real</span></div></article><article class="panel systems"><div class="panel-head"><div><span class="eyebrow">CONECTIVIDAD</span><h2>Estado del sistema</h2></div></div><div class="system-row"><i>✓</i><p><b>Cámara y detección EPP</b><small>Procesamiento de casco y chaleco</small></p><span>OPERATIVO</span></div><div class="system-row"><i>✓</i><p><b>Ciclo de excavación</b><small>Hitos y tiempos recibidos por LoRa</small></p><span>OPERATIVO</span></div></article></div></section>
-<section id="epp" class="view"><div class="section-title"><div><span class="eyebrow">SEGURIDAD</span><h2>Cumplimiento de EPP</h2><p>Detección de casco y chaleco reflectante por cámara.</p></div><a href="images.html">Abrir galería completa</a></div><div class="kpis simple"><article><div><label>Eventos evaluados</label><strong id="epp-total">—</strong></div></article><article><div><label>Cumplimiento</label><strong id="epp-pct">—</strong></div></article><article><div><label>Incumplimientos</label><strong id="epp-fails">—</strong></div></article><article><div><label>EPP más faltante</label><strong class="small" id="epp-missing">—</strong></div></article></div><div class="epp-layout"><article class="panel"><div class="panel-head"><h2>Cumplimiento por elemento</h2></div><div id="epp-breakdown" class="breakdown"></div></article><article class="panel"><div class="panel-head"><h2>Últimas imágenes</h2></div><div id="epp-latest-grid" class="mini-images"><p class="empty">Sin imágenes</p></div></article></div></section>
-<section id="cycle" class="view"><div class="section-title"><div><span class="eyebrow">PRODUCTIVIDAD</span><h2>Ciclo de excavación</h2><p>Inicio, término, duración y desviación de cada hito recibido por LoRa.</p></div><button id="export-active">Exportar CSV</button></div><div class="kpis simple"><article><div><label>Ciclos registrados</label><strong id="cycles-total">—</strong></div></article><article><div><label>Tiempo promedio</label><strong id="cycles-avg">—</strong></div></article><article><div><label>Hito actual</label><strong class="small" id="cycles-stage">—</strong></div></article><article><div><label>Avance total</label><strong id="cycles-advance">—</strong></div></article></div><article class="panel table-wrap"><table><thead><tr><th>#</th><th>Hito</th><th>Inicio</th><th>Término</th><th>Duración</th><th>Objetivo</th><th>Desviación</th><th>Estado</th></tr></thead><tbody id="stage-table"><tr><td colspan="8" class="empty">Sin ciclo activo</td></tr></tbody></table></article></section>
-<section id="evidence" class="view"><div class="section-title"><div><span class="eyebrow">RESPALDO VISUAL</span><h2>Evidencias del ciclo</h2><p>Imágenes y clips asociados a cada hito.</p></div></div><div id="evidence-grid" class="evidence"><article class="panel empty">Sin evidencias del ciclo.</article></div></section><section id="history" class="view"><div class="section-title"><div><span class="eyebrow">TRAZABILIDAD</span><h2>Historial de ciclos</h2><p>Comparación por turno y frente.</p></div><button id="export-history">Descargar CSV</button></div><article class="panel table-wrap"><table><thead><tr><th>Ciclo</th><th>Inicio</th><th>Turno</th><th>Frente</th><th>Duración</th><th>Objetivo</th><th>Avance</th><th>Estado</th></tr></thead><tbody id="history-table"><tr><td colspan="8" class="empty">Cargando…</td></tr></tbody></table></article></section></div></main>
-<nav class="mobile"><button class="active" data-view="summary">⌂<small>Resumen</small></button><button data-view="epp">◉<small>EPP</small></button><button data-view="cycle">◷<small>Ciclo</small></button><button data-view="evidence">▣<small>Evidencias</small></button><button data-view="history">≡<small>Historial</small></button></nav><script src="js/config.js"></script><script src="js/api.js"></script><script src="js/auth.js"></script><script src="js/linea9_dashboard.js?v=3"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Metro L9 · Control operacional</title>
+  <link rel="stylesheet" href="css/linea9.css?v=3">
+</head>
+
+<body>
+
+<aside>
+  <div class="brand">
+    <i>L9</i>
+    <div>
+      <b>METRO</b>
+      <small>Control operacional</small>
+    </div>
+  </div>
+
+  <div class="site-chip">
+    <span></span>
+    <div>
+      <small>OBRA ACTIVA</small>
+      <b>Línea 9 · Frente Norte</b>
+    </div>
+  </div>
+
+  <nav>
+    <button class="active" data-view="summary">
+      <i>⌂</i>
+      <span>Resumen</span>
+    </button>
+
+    <button data-view="epp">
+      <i>◉</i>
+      <span>Control de EPP</span>
+    </button>
+
+    <button data-view="cycle">
+      <i>◷</i>
+      <span>Ciclo de excavación</span>
+    </button>
+
+    <button data-view="evidence">
+      <i>▣</i>
+      <span>Evidencias</span>
+    </button>
+
+    <button data-view="history">
+      <i>≡</i>
+      <span>Historial</span>
+    </button>
+  </nav>
+
+  <footer>
+    <span class="online-dot"></span>
+
+    <div>
+      <b>Sistemas conectados</b>
+      <small>Cámara EPP · Gateway LoRa</small>
+    </div>
+
+    <button onclick="logout()">Salir</button>
+  </footer>
+</aside>
+
+
+<main>
+
+<header>
+  <div>
+    <p>OPERACIÓN / LÍNEA 9</p>
+    <h1 id="title">Resumen operacional</h1>
+  </div>
+
+  <div class="header-actions">
+    <span id="last-update">Sincronizando…</span>
+    <button id="refresh">↻ Actualizar</button>
+  </div>
+</header>
+
+
+<div class="content">
+
+<!-- ===================================================== -->
+<!-- RESUMEN -->
+<!-- ===================================================== -->
+
+<section id="summary" class="view active">
+
+  <div class="status-bar">
+    <span class="pulse"></span>
+    <b id="connection">Consultando AWS…</b>
+    <small>Actualización automática cada 5 segundos</small>
+  </div>
+
+
+  <div class="kpis">
+
+    <article>
+      <span class="kpi-icon green">✓</span>
+      <div>
+        <label>Cumplimiento EPP</label>
+        <strong id="sum-epp">—</strong>
+        <small>Casco y chaleco · 24 h</small>
+      </div>
+    </article>
+
+    <article>
+      <span class="kpi-icon amber">◷</span>
+      <div>
+        <label>Hito en ejecución</label>
+        <strong class="small" id="sum-stage">
+          Sin ciclo activo
+        </strong>
+        <small id="sum-stage-time">—</small>
+      </div>
+    </article>
+
+    <article>
+      <span class="kpi-icon blue">↻</span>
+      <div>
+        <label>Duración del ciclo</label>
+        <strong id="sum-duration">—</strong>
+        <small>Tiempo transcurrido</small>
+      </div>
+    </article>
+
+    <article>
+      <span class="kpi-icon orange">↗</span>
+      <div>
+        <label>Avance registrado</label>
+        <strong id="sum-advance">—</strong>
+        <small>Acumulado del túnel</small>
+      </div>
+    </article>
+
+  </div>
+
+
+  <!-- =================================================== -->
+  <!-- BLOQUE PRINCIPAL -->
+  <!-- =================================================== -->
+
+  <div class="operations-grid">
+
+    <!-- ÚLTIMO EVENTO EPP -->
+
+    <article class="panel visual-panel">
+
+      <div class="panel-head">
+
+        <div>
+          <span class="eyebrow">
+            REGISTRO DE SEGURIDAD
+          </span>
+
+          <h2>Último evento EPP</h2>
+        </div>
+
+        <span class="evidence-tag">
+          EVIDENCIA
+        </span>
+
+      </div>
+
+
+      <div class="camera-frame evidence-frame">
+
+        <img
+          id="live-epp-image"
+          alt="Evidencia del último evento EPP"
+        >
+
+
+        <div
+          id="camera-empty"
+          class="camera-empty"
+        >
+
+          <span>▣</span>
+
+          <b>
+            Sin eventos EPP registrados
+          </b>
+
+          <small>
+            Las imágenes aparecerán únicamente
+            cuando se genere un evento EPP.
+          </small>
+
+        </div>
+
+
+        <div class="camera-overlay">
+
+          <span id="camera-location">
+            Cámara EPP · Frente Norte
+          </span>
+
+          <time id="camera-time"></time>
+
+        </div>
+
+      </div>
+
+
+      <div class="epp-summary">
+
+        <div>
+
+          <span
+            id="live-epp-status"
+            class="shield"
+          >
+            ✓
+          </span>
+
+          <p>
+
+            <b id="live-epp-title">
+              Último evento registrado
+            </b>
+
+            <small id="live-epp-meta">
+              Casco y chaleco
+            </small>
+
+          </p>
+
+        </div>
+
+
+        <a href="images.html">
+          Ver historial EPP →
+        </a>
+
+      </div>
+
+    </article>
+
+
+    <!-- CICLO DE EXCAVACIÓN -->
+
+    <article class="panel cycle-panel">
+
+      <div class="panel-head">
+
+        <div>
+          <span class="eyebrow">
+            DATOS DEL TÚNEL · LORA
+          </span>
+
+          <h2 id="cycle-name">
+            Ciclo activo
+          </h2>
+        </div>
+
+        <span class="lora-tag">
+          ⌁ LoRa
+        </span>
+
+      </div>
+
+
+      <p
+        id="cycle-meta"
+        class="panel-meta"
+      >
+        Esperando inicio de ciclo
+      </p>
+
+
+      <div
+        id="stage-list"
+        class="stages"
+      >
+
+        <p class="empty">
+          Los hitos aparecerán cuando el PC
+          del túnel envíe eventos.
+        </p>
+
+      </div>
+
+    </article>
+
+  </div>
+
+
+  <!-- =================================================== -->
+  <!-- BLOQUES INFERIORES -->
+  <!-- =================================================== -->
+
+  <div class="lower-grid">
+
+    <article class="panel">
+
+      <div class="panel-head">
+
+        <div>
+          <span class="eyebrow">
+            PRODUCTIVIDAD
+          </span>
+
+          <h2>
+            Tiempo real versus objetivo
+          </h2>
+        </div>
+
+        <small>
+          Últimos cinco ciclos
+        </small>
+
+      </div>
+
+
+      <div
+        id="chart"
+        class="chart"
+      >
+        <p class="empty">
+          Sin ciclos terminados
+        </p>
+      </div>
+
+
+      <div class="legend">
+
+        <span>
+          <i></i>
+          Objetivo
+        </span>
+
+        <span>
+          <i class="real"></i>
+          Tiempo real
+        </span>
+
+      </div>
+
+    </article>
+
+
+    <article class="panel systems">
+
+      <div class="panel-head">
+
+        <div>
+          <span class="eyebrow">
+            CONECTIVIDAD
+          </span>
+
+          <h2>
+            Estado del sistema
+          </h2>
+        </div>
+
+      </div>
+
+
+      <div class="system-row">
+
+        <i>✓</i>
+
+        <p>
+          <b>
+            Cámara y detección EPP
+          </b>
+
+          <small>
+            Procesamiento local de casco
+            y chaleco
+          </small>
+        </p>
+
+        <span>
+          OPERATIVO
+        </span>
+
+      </div>
+
+
+      <div class="system-row">
+
+        <i>✓</i>
+
+        <p>
+          <b>
+            Ciclo de excavación
+          </b>
+
+          <small>
+            Hitos y tiempos recibidos
+            por LoRa
+          </small>
+        </p>
+
+        <span>
+          OPERATIVO
+        </span>
+
+      </div>
+
+    </article>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- CONTROL EPP -->
+<!-- ===================================================== -->
+
+<section id="epp" class="view">
+
+  <div class="section-title">
+
+    <div>
+
+      <span class="eyebrow">
+        SEGURIDAD
+      </span>
+
+      <h2>
+        Cumplimiento de EPP
+      </h2>
+
+      <p>
+        Eventos registrados por detección
+        de casco y chaleco reflectante.
+      </p>
+
+    </div>
+
+
+    <a href="images.html">
+      Abrir galería completa
+    </a>
+
+  </div>
+
+
+  <div class="kpis simple">
+
+    <article>
+      <div>
+        <label>
+          Eventos evaluados
+        </label>
+
+        <strong id="epp-total">
+          —
+        </strong>
+      </div>
+    </article>
+
+
+    <article>
+      <div>
+        <label>
+          Cumplimiento
+        </label>
+
+        <strong id="epp-pct">
+          —
+        </strong>
+      </div>
+    </article>
+
+
+    <article>
+      <div>
+        <label>
+          Incumplimientos
+        </label>
+
+        <strong id="epp-fails">
+          —
+        </strong>
+      </div>
+    </article>
+
+
+    <article>
+      <div>
+        <label>
+          EPP más faltante
+        </label>
+
+        <strong
+          class="small"
+          id="epp-missing"
+        >
+          —
+        </strong>
+      </div>
+    </article>
+
+  </div>
+
+
+  <div class="epp-layout">
+
+    <article class="panel">
+
+      <div class="panel-head">
+        <h2>
+          Cumplimiento por elemento
+        </h2>
+      </div>
+
+      <div
+        id="epp-breakdown"
+        class="breakdown"
+      ></div>
+
+    </article>
+
+
+    <article class="panel">
+
+      <div class="panel-head">
+        <h2>
+          Últimos eventos EPP
+        </h2>
+      </div>
+
+
+      <div
+        id="epp-latest-grid"
+        class="mini-images"
+      >
+        <p class="empty">
+          Sin eventos registrados
+        </p>
+      </div>
+
+    </article>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- CICLO -->
+<!-- ===================================================== -->
+
+<section id="cycle" class="view">
+
+  <div class="section-title">
+
+    <div>
+
+      <span class="eyebrow">
+        PRODUCTIVIDAD
+      </span>
+
+      <h2>
+        Ciclo de excavación
+      </h2>
+
+      <p>
+        Inicio, término, duración y desviación
+        de cada hito recibido por LoRa.
+      </p>
+
+    </div>
+
+
+    <button id="export-active">
+      Exportar CSV
+    </button>
+
+  </div>
+
+
+  <div class="kpis simple">
+
+    <article>
+      <div>
+        <label>
+          Ciclos registrados
+        </label>
+
+        <strong id="cycles-total">
+          —
+        </strong>
+      </div>
+    </article>
+
+
+    <article>
+      <div>
+        <label>
+          Tiempo promedio
+        </label>
+
+        <strong id="cycles-avg">
+          —
+        </strong>
+      </div>
+    </article>
+
+
+    <article>
+      <div>
+        <label>
+          Hito actual
+        </label>
+
+        <strong
+          class="small"
+          id="cycles-stage"
+        >
+          —
+        </strong>
+      </div>
+    </article>
+
+
+    <article>
+      <div>
+        <label>
+          Avance total
+        </label>
+
+        <strong id="cycles-advance">
+          —
+        </strong>
+      </div>
+    </article>
+
+  </div>
+
+
+  <article class="panel table-wrap">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Hito</th>
+          <th>Inicio</th>
+          <th>Término</th>
+          <th>Duración</th>
+          <th>Objetivo</th>
+          <th>Desviación</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+
+
+      <tbody id="stage-table">
+
+        <tr>
+          <td
+            colspan="8"
+            class="empty"
+          >
+            Sin ciclo activo
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </article>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- EVIDENCIAS DEL CICLO -->
+<!-- ===================================================== -->
+
+<section id="evidence" class="view">
+
+  <div class="section-title">
+
+    <div>
+
+      <span class="eyebrow">
+        RESPALDO VISUAL
+      </span>
+
+      <h2>
+        Evidencias del ciclo
+      </h2>
+
+      <p>
+        Imágenes asociadas a hitos
+        registrados del ciclo de excavación.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="evidence-grid"
+    class="evidence"
+  >
+
+    <article class="panel empty">
+      Sin evidencias del ciclo.
+    </article>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- HISTORIAL -->
+<!-- ===================================================== -->
+
+<section id="history" class="view">
+
+  <div class="section-title">
+
+    <div>
+
+      <span class="eyebrow">
+        TRAZABILIDAD
+      </span>
+
+      <h2>
+        Historial de ciclos
+      </h2>
+
+      <p>
+        Comparación por turno y frente.
+      </p>
+
+    </div>
+
+
+    <button id="export-history">
+      Descargar CSV
+    </button>
+
+  </div>
+
+
+  <article class="panel table-wrap">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Ciclo</th>
+          <th>Inicio</th>
+          <th>Turno</th>
+          <th>Frente</th>
+          <th>Duración</th>
+          <th>Objetivo</th>
+          <th>Avance</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+
+
+      <tbody id="history-table">
+
+        <tr>
+          <td
+            colspan="8"
+            class="empty"
+          >
+            Cargando…
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </article>
+
+</section>
+
+</div>
+</main>
+
+
+<!-- ===================================================== -->
+<!-- MENÚ MÓVIL -->
+<!-- ===================================================== -->
+
+<nav class="mobile">
+
+  <button
+    class="active"
+    data-view="summary"
+  >
+    ⌂
+    <small>Resumen</small>
+  </button>
+
+  <button data-view="epp">
+    ◉
+    <small>EPP</small>
+  </button>
+
+  <button data-view="cycle">
+    ◷
+    <small>Ciclo</small>
+  </button>
+
+  <button data-view="evidence">
+    ▣
+    <small>Evidencias</small>
+  </button>
+
+  <button data-view="history">
+    ≡
+    <small>Historial</small>
+  </button>
+
+</nav>
+
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/linea9_dashboard.js?v=3"></script>
+
+</body>
+</html>
