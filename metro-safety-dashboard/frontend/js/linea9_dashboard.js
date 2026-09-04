@@ -405,64 +405,6 @@ function renderCycles(data) {
     }
 
 
-    /* Evidencias del ciclo */
-
-    const evidence =
-        cycle?.stages?.filter(
-            stageItem => stageItem.evidence_url
-        ) || [];
-
-
-    if (evidence.length) {
-
-        el('evidence-grid').innerHTML =
-            evidence.map(stageItem => `
-
-                <article class="panel">
-
-                    <img
-                        src="${esc(stageItem.evidence_url)}"
-                        alt="Evidencia ${esc(stageItem.stage_name)}"
-                    >
-
-                    <h3>
-                        ${esc(stageItem.stage_name)}
-                    </h3>
-
-                    <small>
-                        ${time(stageItem.started_at)}
-                        ·
-                        confianza
-                        ${
-                            Math.round(
-                                (stageItem.confidence || 0) * 100
-                            )
-                        }%
-                    </small>
-
-                    ${
-                        stageItem.tracked_object === 'brazo_hp1'
-                            ? `
-                                <p>
-                                    Tiempo visible del brazo:
-                                    ${duration(stageItem.visible_seconds)}
-                                </p>
-                              `
-                            : ''
-                    }
-
-                </article>
-
-            `).join('');
-
-    } else {
-
-        el('evidence-grid').innerHTML = `
-            <article class="panel empty">
-                Sin evidencias del ciclo.
-            </article>
-        `;
-    }
 }
 
 
@@ -621,6 +563,12 @@ function renderImages(images) {
             </p>
         `;
 
+        el('evidence-grid').innerHTML = `
+            <article class="panel empty">
+                Sin imágenes EPP registradas.
+            </article>
+        `;
+
         return;
     }
 
@@ -714,6 +662,47 @@ function renderImages(images) {
 
             `)
             .join('');
+
+
+    /* Galería exclusiva de evidencias EPP */
+
+    el('evidence-grid').innerHTML =
+        events.map(event => {
+
+            const eventCompliance = Number(
+                event.overall_compliance_percentage || 0
+            );
+
+            const eventCompliant = eventCompliance >= 100;
+
+            return `
+                <article class="panel">
+
+                    <img
+                        src="${esc(event.image_url)}"
+                        alt="Evidencia EPP ${esc(event.event_id || '')}"
+                    >
+
+                    <h3>
+                        ${eventCompliant
+                            ? 'EPP conforme'
+                            : 'Incumplimiento EPP'}
+                    </h3>
+
+                    <small>
+                        ${dateTime(event.timestamp)} ·
+                        ${event.workers_detected || 0} persona(s)
+                    </small>
+
+                    <p>
+                        Casco y chaleco ·
+                        ${eventCompliance.toFixed(1)}% cumplimiento
+                    </p>
+
+                </article>
+            `;
+
+        }).join('');
 }
 
 
@@ -891,7 +880,7 @@ document
                     'Ciclo de excavación',
 
                 evidence:
-                    'Evidencias visuales',
+                    'Imágenes procesadas EPP',
 
                 history:
                     'Historial de ciclos'
