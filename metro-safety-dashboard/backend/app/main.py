@@ -45,6 +45,7 @@ from app.api.dashboard_routes import router as dashboard_router
 from app.api.events_routes import router as events_router
 from app.api.export_routes import router as export_router
 from app.api.cycle_routes import router as cycle_router
+from app.api.cycle_lora_routes import router as cycle_lora_router
 
 app.include_router(auth_router)
 app.include_router(epp_router)
@@ -54,6 +55,7 @@ app.include_router(dashboard_router)
 app.include_router(events_router)
 app.include_router(export_router)
 app.include_router(cycle_router)
+app.include_router(cycle_lora_router)
 
 @app.get("/api/health")
 def health_check():
