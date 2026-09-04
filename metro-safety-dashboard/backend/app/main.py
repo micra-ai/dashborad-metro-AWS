@@ -3,10 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database.connection import Base, engine
+import app.models  # Registra todos los modelos antes de crear las tablas
 import json
 import os
 
 app = FastAPI(title="Metro Safety Dashboard API")
+Base.metadata.create_all(bind=engine)
 
 # Setup CORS
 origins = settings.CORS_ORIGINS
@@ -42,6 +44,7 @@ from app.api.milesight_routes import router as milesight_router
 from app.api.dashboard_routes import router as dashboard_router
 from app.api.events_routes import router as events_router
 from app.api.export_routes import router as export_router
+from app.api.cycle_routes import router as cycle_router
 
 app.include_router(auth_router)
 app.include_router(epp_router)
@@ -50,6 +53,7 @@ app.include_router(milesight_router)
 app.include_router(dashboard_router)
 app.include_router(events_router)
 app.include_router(export_router)
+app.include_router(cycle_router)
 
 @app.get("/api/health")
 def health_check():
@@ -345,4 +349,3 @@ def dashboard_epp_metrics(minutes: int = 15):
         "epp_breakdown": epp_breakdown,
 
     }
-
