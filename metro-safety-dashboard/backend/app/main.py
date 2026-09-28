@@ -153,24 +153,24 @@ def dashboard_epp_metrics(minutes: int = 15):
 
 
 
-summary = cur.execute(
-    """
-    SELECT
-        COUNT(*) AS total,
-        COALESCE(AVG(overall_compliance_percentage), 0) AS compliance_pct,
-        COALESCE(SUM(CASE WHEN non_compliance_detected = 0 THEN 1 ELSE 0 END), 0) AS compliant,
-        COALESCE(SUM(CASE WHEN non_compliance_detected = 1 THEN 1 ELSE 0 END), 0) AS non_compliant
-    FROM epp_events
-    WHERE timestamp >= datetime(?, ?)
-    """,
-    (latest, modifier),
-).fetchone()
+    summary = cur.execute(
+        """
+        SELECT
+            COUNT(*) AS total,
+            COALESCE(AVG(overall_compliance_percentage), 0) AS compliance_pct,
+            COALESCE(SUM(CASE WHEN non_compliance_detected = 0 THEN 1 ELSE 0 END), 0) AS compliant,
+            COALESCE(SUM(CASE WHEN non_compliance_detected = 1 THEN 1 ELSE 0 END), 0) AS non_compliant
+        FROM epp_events
+        WHERE timestamp >= datetime(?, ?)
+        """,
+        (latest, modifier),
+    ).fetchone()
 
-total = int(summary["total"] or 0)
-compliant = int(summary["compliant"] or 0)
-non_compliant = int(summary["non_compliant"] or 0)
+    total = int(summary["total"] or 0)
+    compliant = int(summary["compliant"] or 0)
+    non_compliant = int(summary["non_compliant"] or 0)
 
-compliance_pct = round(float(summary["compliance_pct"] or 0), 2)
+    compliance_pct = round(float(summary["compliance_pct"] or 0), 2)
 
 
 
