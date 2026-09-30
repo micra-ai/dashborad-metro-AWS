@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Metro L9 · Control operacional</title>
-  <link rel="stylesheet" href="css/linea9.css?v=3">
+  <link rel="stylesheet" href="css/linea9.css?v=4">
 </head>
 
 <body>
@@ -32,14 +32,14 @@
       <span>Resumen</span>
     </button>
 
-    <button data-view="epp">
-      <i>◉</i>
-      <span>Control de EPP</span>
-    </button>
-
     <button data-view="cycle">
       <i>◷</i>
       <span>Ciclo de excavación</span>
+    </button>
+
+    <button data-view="epp">
+      <i>◉</i>
+      <span>Control de EPP</span>
     </button>
 
     <button data-view="evidence">
@@ -98,14 +98,7 @@
 
   <div class="kpis">
 
-    <article>
-      <span class="kpi-icon green">✓</span>
-      <div>
-        <label>Cumplimiento EPP</label>
-        <strong id="sum-epp">—</strong>
-        <small>Casco y chaleco · 24 h</small>
-      </div>
-    </article>
+
 
     <article>
       <span class="kpi-icon amber">◷</span>
@@ -136,7 +129,16 @@
       </div>
     </article>
 
-  </div>
+
+<article>
+      <span class="kpi-icon green">✓</span>
+      <div>
+        <label>Cumplimiento EPP</label>
+        <strong id="sum-epp">—</strong>
+        <small>Casco y chaleco · 24 h</small>
+      </div>
+    </article>
+</div>
 
 
   <!-- =================================================== -->
@@ -145,6 +147,55 @@
 
   <div class="operations-grid">
 
+    <!-- CICLO DE EXCAVACIÓN -->
+
+    <article class="panel cycle-panel">
+
+      <div class="panel-head">
+
+        <div>
+          <span class="eyebrow">
+            DATOS DEL TÚNEL · LORA
+          </span>
+
+          <h2 id="cycle-name">
+            Ciclo activo
+          </h2>
+        </div>
+
+        <span class="lora-tag">
+          ⌁ LoRa
+        </span>
+
+      </div>
+
+
+      <p
+        id="cycle-meta"
+        class="panel-meta"
+      >
+        Esperando inicio de ciclo
+      </p>
+
+
+      <div
+        id="stage-list"
+        class="stages"
+      >
+
+        <p class="empty">
+          Los hitos aparecerán cuando el PC
+          del túnel envíe eventos.
+        </p>
+
+      </div>
+
+    </article>
+
+
+
+
+  <!-- =================================================== -->
     <!-- ÚLTIMO EVENTO EPP -->
 
     <article class="panel visual-panel">
@@ -241,55 +292,8 @@
     </article>
 
 
-    <!-- CICLO DE EXCAVACIÓN -->
-
-    <article class="panel cycle-panel">
-
-      <div class="panel-head">
-
-        <div>
-          <span class="eyebrow">
-            DATOS DEL TÚNEL · LORA
-          </span>
-
-          <h2 id="cycle-name">
-            Ciclo activo
-          </h2>
-        </div>
-
-        <span class="lora-tag">
-          ⌁ LoRa
-        </span>
-
-      </div>
-
-
-      <p
-        id="cycle-meta"
-        class="panel-meta"
-      >
-        Esperando inicio de ciclo
-      </p>
-
-
-      <div
-        id="stage-list"
-        class="stages"
-      >
-
-        <p class="empty">
-          Los hitos aparecerán cuando el PC
-          del túnel envíe eventos.
-        </p>
-
-      </div>
-
-    </article>
-
   </div>
 
-
-  <!-- =================================================== -->
   <!-- BLOQUES INFERIORES -->
   <!-- =================================================== -->
 
@@ -366,17 +370,16 @@
 
         <p>
           <b>
-            Cámara y detección EPP
+            API del dashboard
           </b>
 
           <small>
-            Procesamiento local de casco
-            y chaleco
+            Estado de consulta de los datos operacionales
           </small>
         </p>
 
-        <span>
-          OPERATIVO
+        <span id="api-state">
+          CONSULTANDO
         </span>
 
       </div>
@@ -388,17 +391,16 @@
 
         <p>
           <b>
-            Ciclo de excavación
+            Último evento LoRaWAN
           </b>
 
-          <small>
-            Hitos y tiempos recibidos
-            por LoRa
+          <small id="lora-last-event">
+            Aún no hay eventos recibidos
           </small>
         </p>
 
-        <span>
-          OPERATIVO
+        <span id="lora-state">
+          SIN DATOS
         </span>
 
       </div>
@@ -804,14 +806,14 @@
     <small>Resumen</small>
   </button>
 
-  <button data-view="epp">
-    ◉
-    <small>EPP</small>
-  </button>
-
   <button data-view="cycle">
     ◷
     <small>Ciclo</small>
+  </button>
+
+  <button data-view="epp">
+    ◉
+    <small>EPP</small>
   </button>
 
   <button data-view="evidence">
@@ -830,7 +832,7 @@
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/linea9_dashboard.js?v=4"></script>
+<script src="js/linea9_dashboard.js?v=5"></script>
 
 </body>
 </html>

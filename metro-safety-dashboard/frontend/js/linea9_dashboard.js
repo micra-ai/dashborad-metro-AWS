@@ -28,12 +28,20 @@ const duration = seconds => {
 };
 
 
+const parseDate = value => {
+    if (typeof value === 'string' && !/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value)) {
+        return new Date(`${value}Z`);
+    }
+    return new Date(value);
+};
+
+
 const time = value => {
     if (!value) {
         return '—';
     }
 
-    return new Date(value).toLocaleTimeString('es-CL', {
+    return parseDate(value).toLocaleTimeString('es-CL', {
         hour: '2-digit',
         minute: '2-digit'
     });
@@ -45,7 +53,7 @@ const dateTime = value => {
         return '—';
     }
 
-    return new Date(value).toLocaleString('es-CL', {
+    return parseDate(value).toLocaleString('es-CL', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -79,6 +87,34 @@ function activeStage(cycle) {
 /* =========================================================
    CICLO DE EXCAVACIÓN
 ========================================================= */
+
+function updateConnectivity(data) {
+    const candidates = [];
+    for (const cycle of data.recent_cycles || []) {
+        if (cycle.started_at) candidates.push(cycle.started_at);
+        if (cycle.ended_at) candidates.push(cycle.ended_at);
+    }
+    const active = data.active_cycle;
+    if (active?.started_at) candidates.push(active.started_at);
+    for (const stage of active?.stages || []) {
+        if (stage.started_at) candidates.push(stage.started_at);
+        if (stage.ended_at) candidates.push(stage.ended_at);
+    }
+    const latest = candidates
+        .map(value => parseDate(value))
+        .filter(value => Number.isFinite(value.getTime()))
+        .sort((a, b) => b - a)[0];
+
+    el('api-state').textContent = 'DISPONIBLE';
+    el('connection').textContent = latest
+        ? 'API disponible · hay eventos de ciclo LoRaWAN registrados'
+        : 'API disponible · aún no hay eventos de ciclo LoRaWAN';
+    el('lora-state').textContent = latest ? 'CON EVENTOS' : 'SIN DATOS';
+    el('lora-last-event').textContent = latest
+        ? `Último evento de ciclo: ${dateTime(latest.toISOString())}`
+        : 'Aún no hay eventos de ciclo registrados';
+}
+
 
 function renderCycles(data) {
 
@@ -735,6 +771,7 @@ async function load() {
         ]);
 
 
+        updateConnectivity(cycles);
         renderCycles(cycles);
 
         renderEpp(epp);
@@ -742,8 +779,10 @@ async function load() {
         renderImages(images);
 
 
-        el('connection').textContent =
-            'Servicios operacionales conectados';
+        el('last-update').textContent =
+            `Consulta actualizada ${new Date().toLocaleTimeString('es-CL', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            })}`;
 
 
         el('last-update').textContent =
@@ -768,6 +807,7 @@ async function load() {
 
         el('connection').textContent =
             'No fue posible consultar la API';
+        el('api-state').textContent = 'SIN CONEXIÓN';
     }
 }
 
