@@ -10,14 +10,15 @@ Excavación y perfilado; chequeo topográfico; sellado parcial; malla 1 y marcos
 
 1. Actualizar el repositorio en la instancia.
 2. Desde `backend`, activar el entorno virtual y reiniciar FastAPI. Al iniciar se crean `excavation_cycles` y `cycle_stages` sin eliminar los datos EPP.
-3. Para una demostración inicial, ejecutar `python seed_linea9_demo.py`.
-4. Copiar `frontend/` a `/var/www/metro-dashboard/` y recargar Nginx.
+3. Para una demostración inicial, ejecutar `python seed_linea9_demo.py`. La muestra `L9-DEMO-001` queda completada, con 4 h 32 min de duración y objetivo de 4 h 45 min; no se presenta como un ciclo LoRaWAN verificado.
+4. Si `L9-DEMO-001` ya existe con una duración desactualizada, ejecutar una vez `python normalize_linea9_demo.py`. El script modifica solo ese registro demo y sus hitos, cerrándolo para que el tiempo no siga aumentando.
+5. Copiar `frontend/` a `/var/www/metro-dashboard/` y recargar Nginx.
 
 ## API del modelo
 
 - `POST /api/cycles`: crea un ciclo y sus hitos.
 - `POST /api/cycles/{cycle_id}/stages`: agrega un hito.
-- `GET /api/cycles/summary`: resumen y ciclo activo.
+- `GET /api/cycles/summary`: resumen, ciclo activo y último ciclo con hitos.
 - `GET /api/cycles`: historial.
 
 Para HP1 enviar `tracked_object: "brazo_hp1"` y `visible_seconds` con el tiempo acumulado del brazo visible.

@@ -122,7 +122,8 @@ function renderCycles(data) {
 
     appState.summary = data;
 
-    const cycle = data.active_cycle;
+    const cycle = data.active_cycle || data.latest_cycle;
+    const cycleIsActive = cycle?.status === 'IN_PROGRESS';
     const stage = activeStage(cycle);
 
 
@@ -133,7 +134,7 @@ function renderCycles(data) {
 
     el('sum-stage-time').textContent =
         stage
-            ? `En curso · ${duration(stage.duration_seconds)}`
+            ? `${cycleIsActive ? 'En curso' : 'Finalizado'} · ${duration(stage.duration_seconds)}`
             : '—';
 
     el('sum-duration').textContent =
@@ -164,12 +165,12 @@ function renderCycles(data) {
 
     el('cycle-name').textContent =
         cycle
-            ? `Ciclo activo · ${cycle.cycle_id}`
+            ? `${cycleIsActive ? 'Ciclo activo' : 'Último ciclo'} · ${cycle.cycle_id}`
             : 'Ciclo activo';
 
     el('cycle-meta').textContent =
         cycle
-            ? `Inicio ${time(cycle.started_at)} · dispositivo ${cycle.device_id || 'sin identificar'} · objetivo ${duration(cycle.target_duration_seconds)}`
+            ? `Inicio ${time(cycle.started_at)}${!cycleIsActive && cycle.ended_at ? ` · fin ${time(cycle.ended_at)}` : ''} · dispositivo ${cycle.device_id || 'sin identificar'} · objetivo ${duration(cycle.target_duration_seconds)}`
             : 'Esperando eventos del túnel';
 
 
@@ -297,7 +298,7 @@ function renderCycles(data) {
         el('stage-table').innerHTML = `
             <tr>
                 <td colspan="8" class="empty">
-                    Sin ciclo activo
+                    No hay ciclos registrados
                 </td>
             </tr>
         `;
