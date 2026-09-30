@@ -80,6 +80,7 @@ def cycle_summary(db: Session = Depends(get_db)):
         "average_duration_seconds": avg_duration,
         "advance_meters": round(sum(c.advance_meters or 0 for c in cycles), 2),
         "active_cycle": _cycle_payload(active) if active else None,
+        "latest_cycle": _cycle_payload(cycles[0]) if cycles else None,
         "recent_cycles": [_cycle_payload(cycle, False) for cycle in cycles[:10]],
     }
 

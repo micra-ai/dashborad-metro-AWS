@@ -1,27 +1,62 @@
-"""Carga una muestra del ciclo L9. Ejecutar una sola vez desde backend/."""
+"""Carga un ciclo de demostración completado y de duración plausible."""
 from datetime import datetime, timedelta
+
 from app.database.connection import Base, engine
 from app.database.session import SessionLocal
 from app.models.cycle_event import ExcavationCycle, CycleStage
 
+
 Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 if db.query(ExcavationCycle).filter_by(cycle_id="L9-DEMO-001").first():
-    print("Los datos demo ya existen")
+    print("Los datos demo ya existen; use normalize_linea9_demo.py para corregirlos.")
     raise SystemExit(0)
 
-start = datetime.utcnow() - timedelta(hours=4, minutes=32)
-cycle = ExcavationCycle(cycle_id="L9-DEMO-001", device_id="camera-01", front="Frente Norte", shift="Día", started_at=start, target_duration_seconds=17100, advance_meters=0.9, status="IN_PROGRESS")
-db.add(cycle); db.flush()
+end = datetime.utcnow()
+start = end - timedelta(hours=4, minutes=32)
+cycle = ExcavationCycle(
+    cycle_id="L9-DEMO-001",
+    device_id="camera-01",
+    front="Frente Norte",
+    shift="Día",
+    started_at=start,
+    ended_at=end,
+    target_duration_seconds=4 * 60 * 60 + 45 * 60,
+    advance_meters=0.9,
+    status="COMPLETED",
+)
+db.add(cycle)
+db.flush()
+
+# Duraciones reales de muestra: suman 4 h 32 min; objetivos, 4 h 45 min.
 definitions = [
-    ("excavation", "Excavación y perfilado", 0, 72, 80, "excavadora", "COMPLETED"),
-    ("topography", "Chequeo topográfico", 72, 16, 20, "topografo", "COMPLETED"),
-    ("partial_seal", "Sellado parcial", 88, 36, 40, "equipo_hormigon", "COMPLETED"),
-    ("mesh_frames", "Malla 1 y marcos", 124, 130, 120, "malla_marco", "COMPLETED"),
-    ("hp1", "Proyección HP1", 254, None, 35, "brazo_hp1", "IN_PROGRESS"),
+    ("excavation", "Excavación y perfilado", 72, 80, "excavadora"),
+    ("topography", "Chequeo topográfico", 16, 20, "topografo"),
+    ("partial_seal", "Sellado parcial", 36, 40, "equipo_hormigon"),
+    ("mesh_frames", "Malla 1 y marcos", 130, 130, "malla_marco"),
+    ("hp1", "Proyección HP1", 18, 15, "brazo_hp1"),
 ]
-for sequence, (code, name, offset, length, target, tracked, status) in enumerate(definitions, 1):
+offset = 0
+for sequence, (code, name, duration_minutes, target_minutes, tracked) in enumerate(definitions, 1):
     stage_start = start + timedelta(minutes=offset)
-    db.add(CycleStage(cycle_id=cycle.id, stage_code=code, stage_name=name, sequence=sequence, started_at=stage_start, ended_at=stage_start + timedelta(minutes=length) if length else None, target_duration_seconds=target * 60, confidence=0.91, tracked_object=tracked, visible_seconds=768 if code == "hp1" else 0, status=status))
-db.commit(); db.close()
-print("Datos demo de Línea 9 creados")
+    stage_end = stage_start + timedelta(minutes=duration_minutes)
+    db.add(
+        CycleStage(
+            cycle_id=cycle.id,
+            stage_code=code,
+            stage_name=name,
+            sequence=sequence,
+            started_at=stage_start,
+            ended_at=stage_end,
+            target_duration_seconds=target_minutes * 60,
+            confidence=0.91,
+            tracked_object=tracked,
+            visible_seconds=768 if code == "hp1" else 0,
+            status="COMPLETED",
+        )
+    )
+    offset += duration_minutes
+
+db.commit()
+db.close()
+print("Ciclo demo L9-DEMO-001 creado como completado (4 h 32 min; origen LoRaWAN no verificado).")

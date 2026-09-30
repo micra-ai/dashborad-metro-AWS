@@ -1,0 +1,37 @@
+ACTUALIZAR EL CICLO DEMO DE 626 HORAS
+
+El dashboard calcula la duración de un ciclo EN CURSO desde su fecha de inicio.
+El registro L9-DEMO-001 quedó abierto en la base y por eso siguió acumulando
+horas aunque era solo una muestra. Este paquete corrige ese registro específico:
+lo deja COMPLETADO con duración de 4 h 32 min y objetivo de 4 h 45 min. Los
+hitos también quedan cerrados y sus duraciones suman 4 h 32 min.
+
+PASOS
+
+1. Descomprime estos archivos encima de la carpeta raíz del repositorio local
+   dashborad-metro-AWS, conservando las rutas de carpetas.
+2. Sube los cambios a GitHub (incluye el backend, dashboard.html,
+   linea9_dashboard.js, seed_linea9_demo.py, normalize_linea9_demo.py y la guía).
+3. En EC2, actualiza el repositorio:
+
+   cd /home/ubuntu/dashborad-metro-AWS
+   git pull origin main
+
+4. Ejecuta la corrección una sola vez:
+
+   cd /home/ubuntu/dashborad-metro-AWS/metro-safety-dashboard/backend
+   source venv/bin/activate
+   python normalize_linea9_demo.py
+
+   Si el entorno virtual tiene otro nombre, activa el mismo entorno que usa
+   FastAPI. El script usa la base configurada para el backend.
+
+5. Reinicia el servicio FastAPI como lo haces normalmente y publica los
+   archivos del frontend en `/var/www/metro-dashboard/` (después ejecuta
+   `sudo nginx -t` y `sudo systemctl reload nginx`). Recarga el dashboard.
+   Verás “Último ciclo · L9-DEMO-001” con sus hitos finalizados y duración de
+   4 h 32 min. El ciclo aparece en el resumen y en el historial; no queda como
+   ciclo activo, así el contador no vuelve a crecer.
+
+El script solo busca el ID exacto L9-DEMO-001. No modifica otros ciclos ni
+confirma origen LoRaWAN. El banner de origen debe seguir diciendo “no verificado”.
