@@ -104,15 +104,17 @@ function updateConnectivity(data) {
         .map(value => parseDate(value))
         .filter(value => Number.isFinite(value.getTime()))
         .sort((a, b) => b - a)[0];
+    const latestCycle = active || (data.recent_cycles || [])[0] || null;
+    const device = latestCycle?.device_id;
 
     el('api-state').textContent = 'DISPONIBLE';
-    el('connection').textContent = latest
-        ? 'API disponible · hay eventos de ciclo LoRaWAN registrados'
-        : 'API disponible · aún no hay eventos de ciclo LoRaWAN';
-    el('lora-state').textContent = latest ? 'CON EVENTOS' : 'SIN DATOS';
-    el('lora-last-event').textContent = latest
-        ? `Último evento de ciclo: ${dateTime(latest.toISOString())}`
-        : 'Aún no hay eventos de ciclo registrados';
+    el('connection').textContent = latestCycle
+        ? 'API disponible · hay ciclos registrados; origen LoRaWAN no verificado'
+        : 'API disponible · aún no hay ciclos registrados';
+    el('lora-state').textContent = latestCycle ? 'NO VERIFICADO' : 'SIN CICLOS';
+    el('lora-last-event').textContent = latestCycle
+        ? `Ciclo ${latestCycle.cycle_id} · dispositivo ${device || 'sin identificar'}${latest ? ` · inicio/actividad ${dateTime(latest.toISOString())}` : ''}`
+        : 'Aún no hay ciclos registrados en el backend';
 }
 
 
@@ -167,7 +169,7 @@ function renderCycles(data) {
 
     el('cycle-meta').textContent =
         cycle
-            ? `Inicio ${time(cycle.started_at)} · objetivo ${duration(cycle.target_duration_seconds)}`
+            ? `Inicio ${time(cycle.started_at)} · dispositivo ${cycle.device_id || 'sin identificar'} · objetivo ${duration(cycle.target_duration_seconds)}`
             : 'Esperando eventos del túnel';
 
 

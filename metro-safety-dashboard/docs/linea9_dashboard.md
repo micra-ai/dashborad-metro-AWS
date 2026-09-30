@@ -55,3 +55,8 @@ Ejemplo mínimo de inicio de ciclo:
 ```
 
 Usar el `devEUI` autorizado en el backend y enviar las marcas de tiempo como Unix en segundos. Para una etapa, incluir también `stage_code`, `stage_name` y `sequence`.
+
+
+## Identificación del origen de un ciclo
+
+La tabla de ciclos también puede contener registros cargados manualmente o datos de demostración. Por eso, ver un ciclo en la pantalla no confirma por sí solo que llegó por LoRaWAN. El resumen muestra el identificador de ciclo y el dispositivo almacenado; valida el uplink en el servidor LoRaWAN y confirma que el `devEUI` autorizado coincide con `device_id` antes de considerar el dato real.
