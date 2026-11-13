@@ -6,3 +6,5 @@ from .excavation_event import ExcavationEvent
 from .cycle_event import ExcavationCycle, CycleStage
 
 from app.models.video_analysis import VideoAnalysis
+
+from .telemetry import SensorReading, ConstructionActivity

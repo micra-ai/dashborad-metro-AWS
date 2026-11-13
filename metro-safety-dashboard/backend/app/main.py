@@ -56,6 +56,8 @@ app.include_router(events_router)
 app.include_router(export_router)
 app.include_router(cycle_router)
 app.include_router(cycle_lora_router)
+from app.api.sensor_routes import router as sensor_router
+app.include_router(sensor_router)
 
 @app.get("/api/health")
 def health_check():

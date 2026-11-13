@@ -1,6 +1,9 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
+    SENSOR_INGEST_TOKEN: str = ""
+    SENSOR_EXTERIOR_DEVICES: str = ""
+    SENSOR_INTERIOR_DEVICES: str = ""
     VIDEO_INGEST_TOKEN: str = ""
     ENVIRONMENT: str = "development"
     DATABASE_URL: str = "sqlite:///./sql_app.db"

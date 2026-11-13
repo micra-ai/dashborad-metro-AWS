@@ -208,7 +208,11 @@ def _history_data(db, date_from, date_to, stage, device_id):
                 "last_received_at": str(r["received_at"]), "message_count": 1,
                 "duration_seconds": dur, "confidence": obj.get("confidence"),
                 "front": obj.get("front"), "shift": obj.get("shift"),
-                "evidence_url": obj.get("evidence_url"), "_first": stamp}
+                "evidence_url": obj.get("evidence_url"),
+                "inicio_evento": obj.get("inicio_evento"), "fin_evento": obj.get("fin_evento"),
+                "estado_sello": obj.get("estado_sello"),
+                "detected_stage_code": obj.get("detected_stage_code"),
+                "classification_status": obj.get("classification_status"), "_first": stamp}
         groups.append(item)
         last[key] = item
     for item in groups:
@@ -272,8 +276,8 @@ def received_history(date_from: date, date_to: date, stage: str = '',
 def export_received_history(date_from: date, date_to: date, stage: str = '',
                             device_id: str = 'A8404180C45D1554', db: Session = Depends(get_db)):
     groups, originals, invalid = _history_data(db,date_from,date_to,stage,device_id)
-    headers=['ID fuente','Tipo','Ciclo','Etapa','Código','Primera recepción Chile','Última recepción Chile','Mensajes','Duración reportada (s)','Frente','Turno','Confianza','URL evidencia']
-    keys=['source_id','event_type','cycle_id','stage_name','stage_code','first_received_at','last_received_at','message_count','duration_seconds','front','shift','confidence','evidence_url']
+    headers=['ID fuente','Tipo','Ciclo','Etapa','Código','Primera recepción Chile','Última recepción Chile','Mensajes','Duración reportada (s)','Frente','Turno','Confianza','URL evidencia','Inicio evento (ISO 8601)','Fin evento (ISO 8601)','Estado sello al inicio','Actividad detectada','Clasificación']
+    keys=['source_id','event_type','cycle_id','stage_name','stage_code','first_received_at','last_received_at','message_count','duration_seconds','front','shift','confidence','evidence_url','inicio_evento','fin_evento','estado_sello','detected_stage_code','classification_status']
     from datetime import datetime as DT, timezone as TZ
 
     from zoneinfo import ZoneInfo
