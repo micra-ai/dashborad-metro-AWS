@@ -1,11 +1,11 @@
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class CycleLoRaObject(BaseModel):
-    event_type: Literal["CYCLE_START", "STAGE_START", "STAGE_END", "CYCLE_END"]
-    cycle_id: str = Field(min_length=1, max_length=100)
+    event_type: Literal["CYCLE_START", "STAGE_START", "STAGE_END", "CYCLE_END", "HEARTBEAT_STATUS"]
+    cycle_id: Optional[str] = Field(default=None, min_length=1, max_length=100)
     stage_code: Optional[str] = None
     stage_name: Optional[str] = None
     sequence: Optional[int] = Field(default=None, ge=1)
@@ -20,8 +20,53 @@ class CycleLoRaObject(BaseModel):
     tracked_object: Optional[str] = None
     advance_meters: float = Field(default=0.0, ge=0)
 
+    camera_online: Optional[bool] = None
+    active_sequence: Optional[int] = Field(default=None, ge=1)
+    active_stage_code: Optional[str] = None
+    daily_completed_cycles: Optional[int] = Field(default=None, ge=0)
+    pending_offline_queue: Optional[int] = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def require_cycle_id(self):
+        if self.event_type != "HEARTBEAT_STATUS" and not self.cycle_id:
+            raise ValueError("cycle_id es obligatorio para eventos de ciclo")
+        return self
+
 
 class CycleLoRaUplinkPayload(BaseModel):
+
+
+    @model_validator(mode="before")
+
+    @classmethod
+
+    def accept_flat_milesight_payload(cls, value):
+
+        if not isinstance(value, dict):
+
+            return value
+
+        if "object" in value or "event_type" not in value:
+
+            return value
+
+        result = dict(value)
+
+        result["object"] = {
+
+            key: value[key]
+
+            for key in CycleLoRaObject.model_fields
+
+            if key in value
+
+        }
+
+        return result
+
+
+
+
     event: Optional[str] = "uplink"
     devEUI: str
     deviceName: Optional[str] = None

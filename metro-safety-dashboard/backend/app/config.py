@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
+    VIDEO_INGEST_TOKEN: str = ""
     ENVIRONMENT: str = "development"
     DATABASE_URL: str = "sqlite:///./sql_app.db"
     SECRET_KEY: str = "super_secret_key_for_development_change_in_production"

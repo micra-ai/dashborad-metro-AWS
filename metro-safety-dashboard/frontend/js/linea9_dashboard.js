@@ -305,78 +305,7 @@ function renderCycles(data) {
     }
 
 
-    /* Historial */
-
     const recent = data.recent_cycles || [];
-
-    if (recent.length) {
-
-        el('history-table').innerHTML =
-            recent.map(item => `
-
-                <tr>
-
-                    <td>
-                        ${esc(item.cycle_id)}
-                    </td>
-
-                    <td>
-                        ${dateTime(item.started_at)}
-                    </td>
-
-                    <td>
-                        ${esc(item.shift)}
-                    </td>
-
-                    <td>
-                        ${esc(item.front)}
-                    </td>
-
-                    <td>
-                        ${duration(item.duration_seconds)}
-                    </td>
-
-                    <td>
-                        ${duration(item.target_duration_seconds)}
-                    </td>
-
-                    <td>
-                        ${Number(item.advance_meters || 0).toFixed(1)} m
-                    </td>
-
-                    <td>
-
-                        <span class="status ${
-                            item.status === 'IN_PROGRESS'
-                                ? 'running'
-                                : ''
-                        }">
-
-                            ${
-                                item.status === 'COMPLETED'
-                                    ? 'Terminado'
-                                    : 'En curso'
-                            }
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
-            `).join('');
-
-    } else {
-
-        el('history-table').innerHTML = `
-            <tr>
-                <td colspan="8" class="empty">
-                    No hay ciclos registrados
-                </td>
-            </tr>
-        `;
-    }
-
 
     /* Gráfico últimos ciclos */
 
@@ -774,7 +703,7 @@ async function load() {
         ]);
 
 
-        updateConnectivity(cycles);
+        el('api-state').textContent = 'DISPONIBLE';
         renderCycles(cycles);
 
         renderEpp(epp);
@@ -951,15 +880,6 @@ el('export-active').onclick =
         );
 
 
-el('export-history').onclick =
-    () =>
-        csv(
-            appState.summary
-                ?.recent_cycles,
-            'historial-ciclos-linea9.csv'
-        );
-
-
 /* =========================================================
    INICIO
 ========================================================= */
@@ -985,3 +905,113 @@ document.addEventListener(
         );
     }
 );
+
+
+// Consulta independiente: un fallo de EPP no impide mostrar los mensajes LoRa.
+let loraPollBusy = false;
+async function pollLoRa() {
+    if (loraPollBusy) return;
+    loraPollBusy = true;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    try {
+        const data = await fetchAPI('/v1/lorawan/linea9-status', {
+            cache: 'no-store', signal: controller.signal
+        });
+        if (!data) return;
+        const latest = data.latest_event;
+        el('lora-poll-state').textContent = `Consulta automática cada 5 s · última consulta ${time(data.generated_at)}`;
+        el('lora-state').textContent = latest ? 'DATOS RECIBIDOS' : 'ESPERANDO DATOS';
+        el('lora-last-event').textContent = latest
+            ? `${latest.event_type} · ${latest.device_id} · recibido ${dateTime(latest.received_at)}`
+            : 'Aún no hay mensajes LoRa recibidos en el backend';
+        el('lora-payload').textContent = latest
+            ? JSON.stringify({
+
+                ...latest,
+
+                received_at_chile: new Date(latest.received_at).toLocaleString('es-CL', {
+
+                    timeZone: 'America/Santiago',
+
+                    hour12: false
+
+                })
+
+            }, (key, value) => value === null ? undefined : value, 2) : 'Esperando mensajes del gateway';
+        const hb = data.heartbeat;
+        el('lora-camera-status').textContent = hb
+            ? `Cámara reportada: ${hb.camera_online === true ? 'en línea' : hb.camera_online === false ? 'fuera de línea' : 'sin dato'} · etapa: ${hb.active_stage_code || 'ninguna'} · ciclos: ${hb.daily_completed_cycles ?? '—'} · cola: ${hb.pending_offline_queue ?? '—'} · estado recibido ${dateTime(hb.received_at)}`
+            : 'Sin estado de cámara recibido';
+        el('lora-event-list').innerHTML = (data.recent_events || []).map(event =>
+            `<p>${esc(dateTime(event.received_at))} · ${esc(event.event_type)} · ${esc(event.object.cycle_id || event.device_id)}</p>`
+        ).join('');
+    } catch (error) {
+        el('lora-poll-state').textContent = 'No se pudo consultar LoRa. Reintentando automáticamente; se conserva el último dato.';
+        el('lora-state').textContent = 'ERROR DE CONSULTA';
+    } finally {
+        clearTimeout(timeout);
+        loraPollBusy = false;
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    pollLoRa();
+    setInterval(pollLoRa, 5000);
+});
+
+
+// Historial independiente: un fallo de EPP no bloquea su consulta.
+const receivedHistory = { page: 1, total: 0, busy: false, version: 0 };
+const serverTime = value => value ? String(value).replace('T', ' ').slice(0, 19) : '—';
+function historyQuery() {
+    return new URLSearchParams({ date_from: el('history-from').value,
+        date_to: el('history-to').value, stage: el('history-stage').value });
+}
+function historyDuration(value) {
+    if (value === null || value === undefined) return '—';
+    const n = Math.floor(Number(value));
+    return `${Math.floor(n / 3600)} h ${String(Math.floor(n % 3600 / 60)).padStart(2, '0')} min ${String(n % 60).padStart(2, '0')} s`;
+}
+async function loadReceivedHistory(reset = false) {
+    if (reset) receivedHistory.page = 1;
+    const version = ++receivedHistory.version;
+    const query = historyQuery();
+    query.set('page', receivedHistory.page); query.set('page_size', '50');
+    el('history-note').textContent = 'Consultando historial…';
+    try {
+        const data = await fetchAPI(`/cycles/history?${query}`);
+        if (version !== receivedHistory.version) return;
+        receivedHistory.total = data.total;
+        const labels = { STAGE_START: 'Inicio de etapa', STAGE_END: 'Término de etapa', CYCLE_START: 'Inicio de ciclo', CYCLE_END: 'Término de ciclo' };
+        el('history-table').innerHTML = data.items.length ? data.items.map(r => `<tr>
+          <td>${esc(serverTime(r.first_received_at))}</td><td>${esc(r.cycle_id)}</td>
+          <td>${esc(r.stage_name || r.stage_code || '—')}</td><td>${esc(labels[r.event_type] || r.event_type)}</td>
+          <td>${esc(historyDuration(r.duration_seconds))}</td><td>${Number(r.message_count)}${r.message_count > 1 ? ' · posible repetición' : ''}</td>
+          <td>${r.confidence == null ? '—' : esc((Number(r.confidence) * 100).toFixed(1)) + '%'}</td></tr>`).join('') : '<tr><td colspan="7">No hay eventos para este filtro.</td></tr>';
+        el('history-note').textContent = `${data.total} grupos provisionales · ${data.original_count} mensajes. ${data.note}${data.invalid_count ? ' Mensajes no interpretables: ' + data.invalid_count : ''}`;
+        el('history-page').textContent = `Página ${receivedHistory.page} de ${Math.max(1, Math.ceil(data.total / 50))}`;
+        el('history-prev').disabled = receivedHistory.page <= 1;
+        el('history-next').disabled = receivedHistory.page * 50 >= data.total;
+    } catch (error) {
+        if (version !== receivedHistory.version) return;
+        el('history-table').innerHTML = '<tr><td colspan="7">No se pudo consultar el historial.</td></tr>';
+        el('history-note').textContent = error.message || 'Error consultando historial';
+    }
+}
+el('history-to').value = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+el('history-apply').onclick = () => loadReceivedHistory(true);
+el('history-prev').onclick = () => { if (receivedHistory.page > 1) { receivedHistory.page--; loadReceivedHistory(); } };
+el('history-next').onclick = () => { if (receivedHistory.page * 50 < receivedHistory.total) { receivedHistory.page++; loadReceivedHistory(); } };
+el('export-history').onclick = async () => {
+    const button = el('export-history'); button.disabled = true; button.textContent = 'Preparando Excel…';
+    try {
+        const data = await fetchAPI(`/cycles/history/export?${historyQuery()}`);
+        const bytes = Uint8Array.from(atob(data.content_base64), c => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+        const a = document.createElement('a'); a.href = url; a.download = data.filename; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } catch (error) { el('history-note').textContent = `No se pudo descargar: ${error.message}`; }
+    finally { button.disabled = false; button.textContent = 'Descargar Excel'; }
+};
+loadReceivedHistory();
+setInterval(() => { if (document.getElementById('history').classList.contains('active')) loadReceivedHistory(); }, 30000);

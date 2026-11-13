@@ -161,9 +161,9 @@ def dashboard_epp_metrics(minutes: int = 15):
             COALESCE(SUM(CASE WHEN non_compliance_detected = 0 THEN 1 ELSE 0 END), 0) AS compliant,
             COALESCE(SUM(CASE WHEN non_compliance_detected = 1 THEN 1 ELSE 0 END), 0) AS non_compliant
         FROM epp_events
-        WHERE timestamp >= datetime(?, ?)
+        WHERE julianday(timestamp) BETWEEN julianday('now', ?) AND julianday('now')
         """,
-        (latest, modifier),
+        (modifier,),
     ).fetchone()
 
     total = int(summary["total"] or 0)
@@ -192,11 +192,11 @@ def dashboard_epp_metrics(minutes: int = 15):
 
         FROM epp_events
 
-        WHERE timestamp >= datetime(?, ?)
+        WHERE julianday(timestamp) BETWEEN julianday('now', ?) AND julianday('now')
 
         """,
 
-        (latest, modifier),
+        (modifier,),
 
     ).fetchone()
 
@@ -287,7 +287,7 @@ def dashboard_epp_metrics(minutes: int = 15):
 
         FROM epp_events
 
-        WHERE timestamp >= datetime(?, ?)
+        WHERE julianday(timestamp) BETWEEN julianday('now', ?) AND julianday('now')
 
           AND alert_level IS NOT NULL
 
@@ -301,7 +301,7 @@ def dashboard_epp_metrics(minutes: int = 15):
 
         """,
 
-        (latest, modifier),
+        (modifier,),
 
     ).fetchone()
 
@@ -336,3 +336,59 @@ def dashboard_epp_metrics(minutes: int = 15):
         "epp_breakdown": epp_breakdown,
 
     }
+
+
+from app.api.video_results_routes import router as video_results_router
+
+
+
+app.include_router(video_results_router)
+
+from app.api.video_routes import router as video_router
+app.include_router(video_router)
+
+from app.api.video_evidence_routes import router as video_evidence_router
+app.include_router(video_evidence_router)
+
+
+
+# Diagnostico temporal LoRa 422
+
+from fastapi.exceptions import RequestValidationError
+
+from fastapi.exception_handlers import request_validation_exception_handler
+
+import logging as _lora_logging
+
+
+
+@app.exception_handler(RequestValidationError)
+
+async def _lora_validation_error(request, exc):
+
+    if request.url.path == "/api/v1/lorawan/linea9-cycle":
+
+        errors = [
+
+            {
+
+                "loc": e.get("loc"),
+
+                "type": e.get("type"),
+
+                "msg": e.get("msg"),
+
+            }
+
+            for e in exc.errors()
+
+        ]
+
+        _lora_logging.getLogger("uvicorn.error").error(
+
+            "LORA_VALIDATION_422: %s", errors
+
+        )
+
+    return await request_validation_exception_handler(request, exc)
+

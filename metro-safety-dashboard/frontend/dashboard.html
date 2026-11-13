@@ -552,6 +552,13 @@
 <!-- ===================================================== -->
 
 <section id="cycle" class="view">
+  <article class="panel" style="margin-bottom:20px;padding:20px">
+    <h2>Mensajes recibidos por LoRa</h2>
+    <p id="lora-poll-state" role="status" aria-live="polite">Consultando al backend…</p>
+    <p id="lora-camera-status">Sin estado de cámara recibido</p>
+    <pre id="lora-payload" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto">Esperando mensajes</pre>
+    <div id="lora-event-list"></div>
+  </article>
 
   <div class="section-title">
 
@@ -724,68 +731,22 @@
 <!-- ===================================================== -->
 
 <section id="history" class="view">
-
-  <div class="section-title">
-
-    <div>
-
-      <span class="eyebrow">
-        TRAZABILIDAD
-      </span>
-
-      <h2>
-        Historial de ciclos
-      </h2>
-
-      <p>
-        Comparación por turno y frente.
-      </p>
-
-    </div>
-
-
-    <button id="export-history">
-      Descargar CSV
-    </button>
-
+  <div class="section-title"><div><span class="eyebrow">TRAZABILIDAD</span>
+  <h2>Historial de actividades recibidas</h2><p>Inicios, términos y duraciones reportadas por LoRa.</p></div>
+  <button id="export-history">Descargar Excel</button></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px">
+    <label>Desde <input id="history-from" type="date" value="2026-10-14"></label>
+    <label>Hasta <input id="history-to" type="date"></label>
+    <label>Etapa <select id="history-stage"><option value="">Todas</option><option value="excavation">Excavación y perfilado</option><option value="topography">Topografía</option><option value="partial_seal">Sellado parcial</option><option value="mesh_frames">Malla y marcos</option><option value="hp1">Proyección HP1</option></select></label>
+    <button id="history-apply">Consultar</button>
   </div>
-
-
-  <article class="panel table-wrap">
-
-    <table>
-
-      <thead>
-        <tr>
-          <th>Ciclo</th>
-          <th>Inicio</th>
-          <th>Turno</th>
-          <th>Frente</th>
-          <th>Duración</th>
-          <th>Objetivo</th>
-          <th>Avance</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-
-
-      <tbody id="history-table">
-
-        <tr>
-          <td
-            colspan="8"
-            class="empty"
-          >
-            Cargando…
-          </td>
-        </tr>
-
-      </tbody>
-
-    </table>
-
-  </article>
-
+  <p id="history-note" role="status" aria-live="polite">Cargando historial…</p>
+  <article class="panel table-wrap"><table><thead><tr>
+    <th>Recepción servidor</th><th>Ciclo</th><th>Etapa</th><th>Evento recibido</th>
+    <th>Duración reportada</th><th>Mensajes del grupo</th><th>Confianza</th>
+  </tr></thead><tbody id="history-table"><tr><td colspan="7">Cargando…</td></tr></tbody></table></article>
+  <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+  <button id="history-prev">Anterior</button><span id="history-page"></span><button id="history-next">Siguiente</button></div>
 </section>
 
 </div>
@@ -832,7 +793,7 @@
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/linea9_dashboard.js?v=7"></script>
+<script src="js/linea9_dashboard.js?v=history-20261019"></script>
 
 </body>
 </html>

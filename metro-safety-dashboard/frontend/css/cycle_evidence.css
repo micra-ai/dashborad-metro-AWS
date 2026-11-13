@@ -1,0 +1,15 @@
+#cycle-evidence {margin-top:24px;padding:22px;background:#101619;border:1px solid #303a40;border-radius:16px;color:#eef5f2}
+#cycle-evidence[hidden] {display:none}
+#cycle-evidence h3 {font-size:20px;margin:0 0 8px}
+#cycle-evidence .cycle-evidence-note {color:#a9b9b2;font-size:14px;line-height:1.5;margin:0 0 18px}
+#cycle-evidence .cycle-evidence-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:18px}
+#cycle-evidence .cycle-evidence-card {overflow:hidden;border:1px solid #35423d;border-radius:12px;background:#16211c;margin:0;min-width:0}
+#cycle-evidence .cycle-evidence-card img {display:block;width:100%;height:210px;object-fit:contain;background:#090e0b}
+#cycle-evidence .cycle-evidence-body {padding:16px}
+#cycle-evidence h4 {font-size:18px;margin:12px 0 8px}
+#cycle-evidence p {font-size:14px;line-height:1.5;margin:6px 0}
+#cycle-evidence small {display:block;overflow-wrap:anywhere;color:#b5c7bd}
+#cycle-evidence .cycle-evidence-tag {display:inline-block;padding:5px 9px;border-radius:7px;background:#253d30;color:#86e7ad;font-size:12px}
+#cycle-evidence .cycle-evidence-pending {height:210px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:#a5b9ac;background:#0d1510;box-sizing:border-box}
+#cycle-evidence a:focus-visible {outline:3px solid #86e7ad;outline-offset:3px;display:block}
+@media(max-width:600px) {#cycle-evidence {padding:14px}#cycle-evidence .cycle-evidence-grid {grid-template-columns:1fr}}

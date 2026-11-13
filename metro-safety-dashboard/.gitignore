@@ -1,0 +1,27 @@
+# Credenciales
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Entornos y caché de Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Datos y evidencias
+/backend/data/
+/backend/video_evidence/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+
+# Respaldos
+*.bak
+*.bak-*
+*.antes_*
+*~
