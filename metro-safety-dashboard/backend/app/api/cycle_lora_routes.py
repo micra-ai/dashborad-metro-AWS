@@ -2,7 +2,7 @@ import json
 import uuid
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Query
 from sqlalchemy.orm import Session
 
 from app.api.milesight_routes import verify_milesight_token
@@ -11,6 +11,8 @@ from app.integration_config.authorized_devices import AUTHORIZED_DEVICES
 from app.models.raw_event import RawEvent
 from app.models.cycle_event import CycleStage, ExcavationCycle
 from app.schemas.cycle_lora_schema import CycleLoRaUplinkPayload
+from app.services.construction_ingest import ingest_construction
+from app.models.telemetry import ConstructionActivity
 
 
 router = APIRouter(tags=["excavation-cycle-lorawan"])
@@ -34,6 +36,8 @@ def process_cycle_lora_payload(payload: CycleLoRaUplinkPayload, db: Session):
         raise HTTPException(status_code=403, detail=f"Dispositivo no autorizado: {payload.devEUI}")
 
     data = payload.object
+    if data.event_id is not None:
+        return ingest_construction(payload, db)
     event_at = _event_time(payload)
     received_at = datetime.utcnow()
     raw = RawEvent(
@@ -146,8 +150,31 @@ def process_cycle_lora_payload(payload: CycleLoRaUplinkPayload, db: Session):
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(verify_milesight_token)],
 )
-def receive_cycle_event(payload: CycleLoRaUplinkPayload, db: Session = Depends(get_db)):
-    return process_cycle_lora_payload(payload, db)
+def receive_cycle_event(payload: CycleLoRaUplinkPayload, response: Response, db: Session = Depends(get_db)):
+    result = process_cycle_lora_payload(payload, db)
+    if result.get("duplicate"):
+        response.status_code = 200
+    return result
+
+
+@router.get("/api/v1/lorawan/linea9-construction-events", dependencies=[Depends(verify_milesight_token)])
+def construction_events(limit: int = Query(100, ge=1, le=1000),
+                        device_id: str = None, cycle_id: str = None,
+                        db: Session = Depends(get_db)):
+    query = db.query(ConstructionActivity)
+    if device_id:
+        query = query.filter(ConstructionActivity.device_id == device_id.strip().upper())
+    if cycle_id:
+        query = query.filter(ConstructionActivity.cycle_id == cycle_id)
+    rows = query.order_by(ConstructionActivity.started_at.desc(), ConstructionActivity.id.desc()).limit(limit).all()
+    return {"events": [{"id": r.id, "device_id": r.device_id, "cycle_id": r.cycle_id,
+                        "detected_stage_code": r.detected_stage_code,
+                        "stage_code": r.classified_stage_code,
+                        "classification_status": r.classification_status,
+                        "estado_sello": r.estado_sello,
+                        "inicio_evento": r.started_at.isoformat() + "Z",
+                        "fin_evento": r.ended_at.isoformat() + "Z",
+                        "duration_seconds": r.duration_seconds} for r in rows]}
 
 
 @router.get("/api/v1/lorawan/linea9-status")

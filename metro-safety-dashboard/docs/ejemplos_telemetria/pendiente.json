@@ -1,0 +1,16 @@
+{
+  "devEUI": "A8404180C45D1554",
+  "object": {
+    "event_id": "tunel-20261112-001-pendiente",
+    "event_type": "STAGE_END",
+    "cycle_id": "ciclo-20261112-001",
+    "stage_code": "shotcrete",
+    "front": "Frente Norte",
+    "shift": "Día",
+    "inicio_evento": "2026-11-12T13:00:00-03:00",
+    "fin_evento": "2026-11-12T14:00:00-03:00",
+    "duration_seconds": 3600,
+    "estado_sello": "desconocido",
+    "confidence": 0.92
+  }
+}
